@@ -1,124 +1,162 @@
+import managers.*;
+import tasks.*;
+import java.util.ArrayList;
+
 public class Main {
     public static void main(String[] args) {
-        TaskManager kanban = new TaskManager();
-        // Test 1 - Creating all tasks
-        kanban.createTask("Сделать домашку по ивриту", "См. стр. 33 учебника", TaskStatus.NEW);
-        kanban.createTask("Убраться дома", "Помыть пол", TaskStatus.NEW);
-        kanban.createEpicTask("Сдать финальное задание Практикума", "Проект канбана", TaskStatus.NEW );
-        kanban.createSubTask("Подготовить код", "См. ТЗ 3го спринта", TaskStatus.NEW, 1);
-        kanban.createSubTask("Проверить код стайл", "См. правила код стайла", TaskStatus.NEW,
-                1);
-        kanban.createEpicTask("Подтвердить диплом", "Подтверждение диплома в министерстве образования",
-                TaskStatus.NEW);
-        kanban.createSubTask("Получить подтверждение в министерстве абсорбции", "Сходить к координатору",
-                TaskStatus.NEW, 2);
-        // Test 2a - Get task, subtask or epic task
-        System.out.println("Разные виды задач, полученные по идентификатору");
-        System.out.println(kanban.getTask(1));
-        System.out.println(kanban.getEpicTask(2));
-        System.out.println(kanban.getSubTask(3));
-        // Test 2b - Printing lists of all tasks
-        System.out.println("Список задач");
-        printListOfTasks(kanban);
-        System.out.println("Список подзадач");
-        printListOfSubTasks(kanban);
-        System.out.println("Список эпиков");
-        printListOfEpicTasks(kanban);
-        // Test 3 - Renewal of task
-        Task renewedTask = new Task("Сделать домашку по ивриту", "См. стр. 33 учебника",
-                TaskStatus.IN_PROGRESS, 1);
-        kanban.renewTask(renewedTask);
-        System.out.println("Обновленный список задач");
-        printListOfTasks(kanban);
-        // Test 4a - Renewal of subtasks and epic task in progress
-        SubTask renewedSubTask1 = new SubTask("Подготовить код", "См. ТЗ 3го спринта",
-                TaskStatus.IN_PROGRESS, 1, 1);
-        SubTask renewedSubTask2 = new SubTask("Проверить код стайл", "См. правила код стайла",
-                TaskStatus.DONE, 1, 2);
-        kanban.renewSubTask(renewedSubTask1);
-        kanban.renewSubTask(renewedSubTask2);
-        System.out.println("Обновленный список подзадач");
-        printListOfSubTasks(kanban);
-        System.out.println("Обновленный список эпиков");
-        printListOfEpicTasks(kanban);
-        // Test 4b - Renewal of subtasks and epic task done
-        SubTask renewedSubTask3 = new SubTask("Подготовить код", "См. ТЗ 3го спринта",
-                TaskStatus.DONE, 1, 1);
-        SubTask renewedSubTask4 = new SubTask("Проверить код стайл", "См. правила код стайла",
-                TaskStatus.DONE, 1, 2);
-        kanban.renewSubTask(renewedSubTask3);
-        kanban.renewSubTask(renewedSubTask4);
-        System.out.println("Обновленный список подзадач");
-        printListOfSubTasks(kanban);
-        System.out.println("Обновленный список эпиков");
-        printListOfEpicTasks(kanban);
-        // Test 5 - Removal of task
-        kanban.removeTask(1);
-        System.out.println("Список задач после удаления задачи");
-        printListOfTasks(kanban);
-        // Test 6 - Removal of subtask
-        kanban.removeSubTask(1);
-        System.out.println("Список подзадач после удаления подзадачи");
-        printListOfSubTasks(kanban);
-        System.out.println("Список эпиков после удаления подзадачи");
-        printListOfEpicTasks(kanban);
-        // Test 7 - Removal of epic task
-        kanban.removeEpicTask(1);
-        System.out.println("Список эпиков после удаления эпика");
-        printListOfEpicTasks(kanban);
-        System.out.println("Список подзадач после удаления эпика");
-        printListOfSubTasks(kanban);
-        // Test 8 - Print list of subtasks for an epic task
-        System.out.println("Список подзадач для эпика 2");
-        for(SubTask subTask : kanban.getListOfSubTasksForEpicTask(2)) {
-            System.out.println(subTask);
+        // Tests for Sprint 3 (redrafted with assert)
+        {
+            TaskManager kanban = Managers.getDefault();
+            // Test 1 - Creating all tasks & getting lists of tasks
+            System.out.println("Тест 1 - Создание задач и получение списков задач");
+            kanban.createTask("Сделать домашку по ивриту", "См. стр. 33 учебника", TaskStatus.NEW);
+            kanban.createTask("Убраться дома", "Помыть пол", TaskStatus.NEW);
+            kanban.createEpicTask("Сдать финальное задание Практикума", "Проект канбана", TaskStatus.NEW);
+            kanban.createEpicTask("Подтвердить диплом", "Подтверждение диплома в министерстве образования",
+                    TaskStatus.NEW);
+            kanban.createSubTask("Подготовить код", "См. ТЗ 3го спринта", TaskStatus.NEW, 3);
+            kanban.createSubTask("Проверить код стайл", "См. правила код стайла", TaskStatus.NEW,
+                    3);
+            kanban.createSubTask("Получить подтверждение в министерстве абсорбции", "Сходить к координатору",
+                    TaskStatus.NEW, 4);
+            assert kanban.getListOfTasks().size() == 2;
+            assert kanban.getListOfEpicTasks().size() == 2;
+            assert kanban.getListOfSubTasks().size() == 3;
+            System.out.println("Успех");
+            // Test 2 - Get a particular task
+            System.out.println("Тест 2 - Просмотр отдельной задачи");
+            assert kanban.getTask(2).getName().equals("Убраться дома");
+            assert kanban.getEpicTask(4).getName().equals("Подтвердить диплом");
+            assert kanban.getSubTask(5).getName().equals("Подготовить код");
+            System.out.println("Успех");
+            // Test 3 - Renewal of task
+            System.out.println("Тест 3 - Обновление задачи");
+            Task renewedTask = new Task("Сделать домашку по ивриту", "См. стр. 33 учебника",
+                    TaskStatus.IN_PROGRESS, 1);
+            kanban.renewTask(renewedTask);
+            assert kanban.getTask(1).getStatus().equals(TaskStatus.IN_PROGRESS);
+            System.out.println("Успех");
+            // Test 4 - Renewal of subtasks and epic task in progress
+            System.out.println("Тест 4 - Обновление подзадачи, статус эпика - in progress");
+            SubTask renewedSubTask1 = new SubTask("Подготовить код", "См. ТЗ 3го спринта",
+                    TaskStatus.IN_PROGRESS, 3, 5);
+            SubTask renewedSubTask2 = new SubTask("Проверить код стайл", "См. правила код стайла",
+                    TaskStatus.DONE, 3, 6);
+            kanban.renewSubTask(renewedSubTask1);
+            kanban.renewSubTask(renewedSubTask2);
+            assert kanban.getSubTask(5).getStatus().equals(TaskStatus.IN_PROGRESS);
+            assert kanban.getSubTask(6).getStatus().equals(TaskStatus.DONE);
+            assert kanban.getEpicTask(3).getStatus().equals(TaskStatus.IN_PROGRESS);
+            System.out.println("Успех");
+            // Test 5 - Renewal of subtasks and epic task done
+            System.out.println("Тест 5 - Обновление подзадачи, статус эпика - done");
+            SubTask renewedSubTask3 = new SubTask("Подготовить код", "См. ТЗ 3го спринта",
+                    TaskStatus.DONE, 3, 5);
+            SubTask renewedSubTask4 = new SubTask("Проверить код стайл", "См. правила код стайла",
+                    TaskStatus.DONE, 3, 6);
+            kanban.renewSubTask(renewedSubTask3);
+            kanban.renewSubTask(renewedSubTask4);
+            assert kanban.getSubTask(5).getStatus().equals(TaskStatus.DONE);
+            assert kanban.getSubTask(6).getStatus().equals(TaskStatus.DONE);
+            assert kanban.getEpicTask(3).getStatus().equals(TaskStatus.DONE);
+            System.out.println("Успех");
+            // Test 6 - Removal of task
+            System.out.println("Тест 6 - Удаление задачи");
+            kanban.removeTask(1);
+            assert kanban.getListOfTasks().size() == 1;
+            assert kanban.getTask(2).getName().equals("Убраться дома");
+            System.out.println("Успех");
+            // Test 7 - Removal of subtask & get list of subtasks for an epic task
+            System.out.println("Тест 7 - Удаление подзадачи и получение списка подзадач эпика");
+            kanban.removeSubTask(5);
+            assert kanban.getListOfSubTasksForEpicTask(3).size() == 1;
+            assert kanban.getSubTask(6).getName().equals("Проверить код стайл");
+            System.out.println("Успех");
+            // Test 8 - Removal of epic task
+            System.out.println("Тест 8 - Удаление эпика");
+            kanban.removeEpicTask(3);
+            assert kanban.getListOfEpicTasks().size() == 1;
+            assert kanban.getListOfSubTasks().size() == 1;
+            assert kanban.getSubTask(7).getName().equals("Получить подтверждение в министерстве абсорбции");
+            System.out.println("Успех");
+            // Test 9 - Clear list of tasks
+            System.out.println("Тест 9 - Очистка списка задач");
+            kanban.clearListOfTasks();
+            assert kanban.getListOfTasks().size() == 0;
+            System.out.println("Успех");
+            // Test 10 - Clear list of subtasks
+            System.out.println("Тест 10 - Очистка списка подзадач");
+            kanban.clearListOfSubtasks();
+            assert kanban.getListOfSubTasks().size() == 0;
+            assert kanban.getListOfSubTasksForEpicTask(4).size() == 0;
+            System.out.println("Успех");
+            // Test 11 - Clear list of epic tasks
+            System.out.println("Тест 11 - Очистка списка эпиков");
+            kanban.clearListOfEpicTasks();
+            assert kanban.getListOfEpicTasks().size() == 0;
+            System.out.println("Успех");
         }
-        // Test 9 - Clear list of tasks
-        kanban.clearListOfTasks();
-        System.out.println("Список задач после очистки");
-        printListOfTasks(kanban);
-        // Test 10 - Clear list of subtasks
-        kanban.clearListOfSubtasks();
-        System.out.println("Список подзадач после очистки подзадач");
-        printListOfSubTasks(kanban);
-        System.out.println("Список эпиков после очистки подзадач");
-        printListOfEpicTasks(kanban);
-        // Test 11 - Clear list of epic tasks
-        kanban.clearListOfEpicTasks();
-        System.out.println("Список эпиков после очистки эпиков");
-        printListOfEpicTasks(kanban);
-        System.out.println("Список подзадач после очистки эпиков");
-        printListOfSubTasks(kanban);
+        // Tests for Sprint 4
+        {
+            System.out.println("Тест 12 - Проверка истории просмотров");
+            TaskManager kanban = Managers.getDefault();
+            // Creation of 5 tasks
+            for(int i = 0; i < 5; i += 1) {
+                kanban.createTask("Имя задачи", "Описание задачи", TaskStatus.NEW);
+            }
+            // Creation of 5 epic tasks
+            for(int i = 0; i < 5; i += 1) {
+                kanban.createEpicTask("Имя эпика", "Описание эпика", TaskStatus.NEW);
+            }
+            // Creation of 5 subtasks (each relates to a different epic task)
+            int epicId = 6;
+            for(int i = 0; i < 5; i += 1) {
+                kanban.createSubTask("Имя подзадачи", "Описание подзадачи", TaskStatus.NEW, epicId);
+                epicId += 1;
+            }
+            // Get 5 tasks and check history
+            for(int idToGet = 1; idToGet <= 5; idToGet += 1) {
+                kanban.getTask(idToGet);
+            }
+            assert kanban.getHistoryManager().getHistory().size() == 5;
+            assert kanban.getHistoryManager().getHistory().get(4).getName().equals("Имя задачи");
+            // Get 5 epic tasks and check history
+            for(int epicIdToGet = 6; epicIdToGet <= 10; epicIdToGet += 1) {
+                kanban.getEpicTask(epicIdToGet);
+            }
+            assert kanban.getHistoryManager().getHistory().size() == 10;
+            assert kanban.getHistoryManager().getHistory().get(9).getName().equals("Имя эпика");
+            // Get 5 subtasks and check history
+            for(int subtaskIdToGet = 11; subtaskIdToGet <= 15; subtaskIdToGet += 1) {
+                kanban.getSubTask(subtaskIdToGet);
+            }
+            assert kanban.getHistoryManager().getHistory().size() == 10;
+            assert kanban.getHistoryManager().getHistory().get(0).getName().equals("Имя эпика");
+            assert kanban.getHistoryManager().getHistory().get(9).getName().equals("Имя подзадачи");
+            System.out.println("Успех");
+            // Print history "as is"
+            ListOfTasksPrinter<Task> history = new ListOfTasksPrinter<>(kanban.getHistoryManager().getHistory());
+            history.printList();
+        }
+    }
+}
+
+// Auxiliary class for printing lists of tasks / history
+class ListOfTasksPrinter<T extends Task> {
+    final private ArrayList<T> listOfTasks;
+
+    public ListOfTasksPrinter(ArrayList<T> listOfTasks) {
+        this.listOfTasks = listOfTasks;
     }
 
-    // Auxiliary methods needed for the above tests (therefore, they are not included in TaskManager class)
-    public static void printListOfTasks(TaskManager manager) {
-        if (manager.getListOfTasks().isEmpty()) {
+    public void printList() {
+        if (listOfTasks.isEmpty()) {
             System.out.println("Список пуст");
         } else {
-            for (Task task : manager.getListOfTasks()) {
+            for (T task : listOfTasks) {
                 System.out.println(task);
             }
         }
     }
-
-    public static void printListOfSubTasks(TaskManager manager) {
-        if (manager.getListOfSubTasks().isEmpty()) {
-            System.out.println("Список пуст");
-        } else {
-            for (SubTask subTask : manager.getListOfSubTasks()) {
-                System.out.println(subTask);
-            }
-        }
-    }
-
-    public static void printListOfEpicTasks(TaskManager manager) {
-        if (manager.getListOfEpicTasks().isEmpty()) {
-            System.out.println("Список пуст");
-        } else {
-            for (EpicTask epicTask : manager.getListOfEpicTasks()) {
-                System.out.println(epicTask);
-            }
-        }
-    }
 }
+

@@ -1,3 +1,5 @@
+package tasks;
+
 public class SubTask extends Task {
     private int epicTaskId;
 
@@ -18,5 +20,4 @@ public class SubTask extends Task {
     public void setEpicTaskId(int epicTaskId) {
         this.epicTaskId = epicTaskId;
     }
-
 }

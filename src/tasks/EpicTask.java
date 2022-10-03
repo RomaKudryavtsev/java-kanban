@@ -1,5 +1,8 @@
+package tasks;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+
 public class EpicTask extends Task {
     private HashMap<Integer, SubTask> mapOfSubTasksForEpicTask = new HashMap<>();
 
