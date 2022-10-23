@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 public class InMemoryTaskManager implements TaskManager {
-    private HashMap<Integer, Task> mapOfTasks = new HashMap<>();
-    private HashMap<Integer, SubTask> mapOfSubTasks = new HashMap<>();
-    private HashMap<Integer, EpicTask> mapOfEpicTasks = new HashMap<>();
+    private final HashMap<Integer, Task> mapOfTasks = new HashMap<>();
+    private final HashMap<Integer, SubTask> mapOfSubTasks = new HashMap<>();
+    private final HashMap<Integer, EpicTask> mapOfEpicTasks = new HashMap<>();
     // NOTE: In this version the single id is used for all types of tasks
     private Integer taskId = 0;
 
@@ -142,6 +142,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeTask(Integer id) {
         if (mapOfTasks.containsKey(id)) {
             mapOfTasks.remove(id);
+            defaultHistory.remove(id);
         }
     }
 
@@ -152,6 +153,7 @@ public class InMemoryTaskManager implements TaskManager {
             SubTask subTaskToBeRemoved = mapOfSubTasks.get(id);
             mapOfEpicTasks.get(subTaskToBeRemoved.getEpicTaskId()).removeSubTaskInEpicTask(subTaskToBeRemoved);
             mapOfSubTasks.remove(id);
+            defaultHistory.remove(id);
         }
     }
 
@@ -161,9 +163,12 @@ public class InMemoryTaskManager implements TaskManager {
         if (mapOfEpicTasks.containsKey(id)) {
             for (SubTask subtaskToBeRemoved : mapOfEpicTasks.get(id).getListOfSubTasks()) {
                 mapOfSubTasks.remove(subtaskToBeRemoved.getId());
+                //NOTE: Removal of epic task from history invokes removal of all subtasks of this epic from history
+                defaultHistory.remove(subtaskToBeRemoved.getId());
             }
             mapOfEpicTasks.get(id).clearAllSubTasks();
             mapOfEpicTasks.remove(id);
+            defaultHistory.remove(id);
         }
     }
 

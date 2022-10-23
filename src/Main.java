@@ -1,10 +1,10 @@
 import managers.*;
 import tasks.*;
-import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        // Tests for Sprint 3 (redrafted with assert)
+        // Tests for Sprint 3
         {
             TaskManager kanban = Managers.getDefault();
             // Test 1 - Creating all tasks & getting lists of tasks
@@ -134,26 +134,78 @@ public class Main {
             assert kanban.getHistoryManager().getHistory().get(0).getName().equals("Имя эпика");
             assert kanban.getHistoryManager().getHistory().get(9).getName().equals("Имя подзадачи");
             System.out.println("Успех");
+        }
+        // Tests for Sprint 5
+        {
+            System.out.println("Тест 13 - Проверка истории просмотров (удаление задач и отсутствие дубликатов)");
+            TaskManager kanban = Managers.getDefault();
+            kanban.createTask("Запись к врачу", "Записаться к врачу", TaskStatus.NEW);
+            kanban.createTask("Сделать покупки", "Сходить в магазин", TaskStatus.NEW);
+            kanban.createEpicTask("Сдать ТЗ 5", "Завершить финальный проект", TaskStatus.NEW);
+            kanban.createEpicTask("Пройти курс Яндекса по математике",
+                    "Основы математики для цифровых профессий", TaskStatus.NEW);
+            kanban.createSubTask("Написать код", "Реализовать новый функционал", TaskStatus.NEW,
+                    3);
+            kanban.createSubTask("Написать тесты", "Тесты для нового функционала", TaskStatus.NEW,
+                    3);
+            kanban.createSubTask("Получить ревью", "Отправить задание на ревью", TaskStatus.NEW,
+                    3);
+            kanban.createTask("Задача 8", "Задача 8", TaskStatus.NEW);
+            kanban.createTask("Задача 9", "Задача 9", TaskStatus.NEW);
+            kanban.createTask("Задача 10", "Задача 10", TaskStatus.NEW);
+            kanban.createTask("Задача 11", "Задача 11", TaskStatus.NEW);
+            kanban.getTask(1);
+            assert kanban.getHistoryManager().getHistory().size() == 1;
+            kanban.getTask(1);
+            assert kanban.getHistoryManager().getHistory().size() == 1;
+            kanban.getTask(2);
+            assert kanban.getHistoryManager().getHistory().size() == 2;
+            kanban.getTask(2);
+            assert kanban.getHistoryManager().getHistory().size() == 2;
+            kanban.getSubTask(7);
+            assert kanban.getHistoryManager().getHistory().size() == 3;
+            kanban.getEpicTask(4);
+            assert kanban.getHistoryManager().getHistory().size() == 4;
+            assert kanban.getHistoryManager().getHistory().get(3).getId() == 4;
+            kanban.getEpicTask(3);
+            assert kanban.getHistoryManager().getHistory().size() == 5;
+            kanban.getSubTask(5);
+            assert kanban.getHistoryManager().getHistory().size() == 6;
+            kanban.getSubTask(6);
+            assert kanban.getHistoryManager().getHistory().size() == 7;
+            kanban.getSubTask(7);
+            assert kanban.getHistoryManager().getHistory().size() == 7;
+            kanban.getTask(11);
+            assert kanban.getHistoryManager().getHistory().size() == 8;
+            kanban.getTask(10);
+            assert kanban.getHistoryManager().getHistory().size() == 9;
+            kanban.getTask(9);
+            assert kanban.getHistoryManager().getHistory().size() == 10;
+            kanban.getTask(8);
+            assert kanban.getHistoryManager().getHistory().size() == 10;
+            kanban.removeTask(8);
+            assert kanban.getHistoryManager().getHistory().size() == 9;
+            assert kanban.getHistoryManager().getHistory().get(8).getId() == 9;
+            kanban.removeEpicTask(3);
+            assert kanban.getHistoryManager().getHistory().size() == 5;
+            assert kanban.getHistoryManager().getHistory().get(0).getId() == 2;
+            kanban.removeTask(2);
+            assert kanban.getHistoryManager().getHistory().size() == 4;
+            assert kanban.getHistoryManager().getHistory().get(0).getId() == 4;
+            System.out.println("Успех");
             // Print history "as is"
-            ListOfTasksPrinter<Task> history = new ListOfTasksPrinter<>(kanban.getHistoryManager().getHistory());
-            history.printList();
+            ListOfTasksPrinter.printList(kanban.getHistoryManager().getHistory());
         }
     }
 }
 
 // Auxiliary class for printing lists of tasks / history
-class ListOfTasksPrinter<T extends Task> {
-    final private ArrayList<T> listOfTasks;
-
-    public ListOfTasksPrinter(ArrayList<T> listOfTasks) {
-        this.listOfTasks = listOfTasks;
-    }
-
-    public void printList() {
+class ListOfTasksPrinter {
+    static public void printList(List<Task> listOfTasks) {
         if (listOfTasks.isEmpty()) {
             System.out.println("Список пуст");
         } else {
-            for (T task : listOfTasks) {
+            for (Task task : listOfTasks) {
                 System.out.println(task);
             }
         }
