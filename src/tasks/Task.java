@@ -3,10 +3,11 @@ package tasks;
 import java.util.Objects;
 
 public class Task {
-    private String name;
-    private String description;
-    private int id;
-    private TaskStatus status = TaskStatus.NEW;
+    protected String name;
+    protected String description;
+    protected int id;
+    protected TaskStatus status;
+    protected TaskType type;
 
     public Task(String name, String description, TaskStatus status) {
         this.name = name;
@@ -21,20 +22,23 @@ public class Task {
         this.id = id;
     }
 
+    public Task(String name, String description, TaskStatus status, TaskType type) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.type = type;
+    }
+
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public TaskType getType() {
+        return type;
     }
 
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public int getId() {
@@ -55,11 +59,12 @@ public class Task {
 
     @Override
     public String toString() {
-        return "tasks.Task{" +
+        return "{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", status=" + status +
+                ", type=" + type +
                 '}';
     }
 

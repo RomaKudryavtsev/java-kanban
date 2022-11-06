@@ -5,18 +5,18 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HashMap<Integer, Task> mapOfTasks = new HashMap<>();
-    private final HashMap<Integer, SubTask> mapOfSubTasks = new HashMap<>();
-    private final HashMap<Integer, EpicTask> mapOfEpicTasks = new HashMap<>();
+    protected HashMap<Integer, Task> mapOfTasks = new HashMap<>();
+    protected HashMap<Integer, SubTask> mapOfSubTasks = new HashMap<>();
+    protected HashMap<Integer, EpicTask> mapOfEpicTasks = new HashMap<>();
     // NOTE: In this version the single id is used for all types of tasks
-    private Integer taskId = 0;
+    protected Integer taskId = 0;
 
     HistoryManager defaultHistory = Managers.getDefaultHistory();
 
     @Override
     public void createTask(String name, String description, TaskStatus status) {
         taskId = taskId + 1;
-        Task task = new Task(name, description, status);
+        Task task = new Task(name, description, status, TaskType.TASK);
         task.setId(taskId);
         mapOfTasks.put(task.getId(), task);
     }
@@ -24,7 +24,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createEpicTask(String name, String description, TaskStatus status) {
         taskId = taskId + 1;
-        EpicTask epicTask = new EpicTask(name, description, status);
+        EpicTask epicTask = new EpicTask(name, description, status, TaskType.EPIC);
         epicTask.setId(taskId);
         mapOfEpicTasks.put(epicTask.getId(), epicTask);
     }
@@ -32,7 +32,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createSubTask(String name, String description, TaskStatus status, int epicTaskId) {
         taskId = taskId + 1;
-        SubTask subTask = new SubTask(name, description, status, epicTaskId);
+        SubTask subTask = new SubTask(name, description, status, epicTaskId, TaskType.SUBTASK);
         subTask.setId(taskId);
         mapOfSubTasks.put(subTask.getId(), subTask);
         mapOfEpicTasks.get(epicTaskId).addSubTask(subTask);
@@ -40,29 +40,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<Task> getListOfTasks() {
-        ArrayList<Task> listOfTasks = new ArrayList<>();
-        for (Task task : mapOfTasks.values()) {
-            listOfTasks.add(task);
-        }
-        return listOfTasks;
+        return new ArrayList<>(mapOfTasks.values());
     }
 
     @Override
     public ArrayList<SubTask> getListOfSubTasks() {
-        ArrayList<SubTask> listOfSubTasks = new ArrayList<>();
-        for (SubTask subTask : mapOfSubTasks.values()) {
-            listOfSubTasks.add(subTask);
-        }
-        return listOfSubTasks;
+        return new ArrayList<>(mapOfSubTasks.values());
     }
 
     @Override
     public ArrayList<EpicTask> getListOfEpicTasks() {
-        ArrayList<EpicTask> listOfEpicTasks = new ArrayList<>();
-        for (EpicTask epicTask : mapOfEpicTasks.values()) {
-            listOfEpicTasks.add(epicTask);
-        }
-        return listOfEpicTasks;
+        return new ArrayList<>(mapOfEpicTasks.values());
     }
 
     @Override

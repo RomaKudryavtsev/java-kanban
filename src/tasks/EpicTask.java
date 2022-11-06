@@ -9,12 +9,13 @@ public class EpicTask extends Task {
     public EpicTask(String name, String description, TaskStatus status) {
         super(name, description, status);
     }
+    public EpicTask(String name, String description, TaskStatus status, TaskType type) {
+        super(name, description, status, type);
+    }
 
     public ArrayList<SubTask> getListOfSubTasks() {
         ArrayList<SubTask> listOfSubTasks = new ArrayList<>();
-        for (SubTask subTask : mapOfSubTasksForEpicTask.values()) {
-            listOfSubTasks.add(subTask);
-        }
+        listOfSubTasks.addAll(mapOfSubTasksForEpicTask.values());
         return listOfSubTasks;
     }
 
@@ -29,8 +30,9 @@ public class EpicTask extends Task {
             allSubTasksAreDone = false;
         } else {
             for(SubTask subTask : mapOfSubTasksForEpicTask.values()) {
-                if(subTask.getStatus() == TaskStatus.IN_PROGRESS || subTask.getStatus() == TaskStatus.NEW) {
+                if (subTask.getStatus() == TaskStatus.IN_PROGRESS || subTask.getStatus() == TaskStatus.NEW) {
                     allSubTasksAreDone = false;
+                    break;
                 }
             }
         }
