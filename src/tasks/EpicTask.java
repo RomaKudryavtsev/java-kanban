@@ -25,7 +25,6 @@ public class EpicTask extends Task {
 
     private boolean checkWhetherEpicTaskIsDone() {
         boolean allSubTasksAreDone = true;
-
         if (mapOfSubTasksForEpicTask.isEmpty()) {
             allSubTasksAreDone = false;
         } else {
@@ -39,10 +38,10 @@ public class EpicTask extends Task {
         return allSubTasksAreDone;
     }
 
-    public void renewSubTaskInEpicTask(SubTask subTask) {
-        if(mapOfSubTasksForEpicTask.containsKey(subTask.getId())) {
-            int subTaskId = subTask.getId();
-            mapOfSubTasksForEpicTask.put(subTaskId, subTask);
+    private void setEpicTaskStatus() {
+        if (mapOfSubTasksForEpicTask.isEmpty()) {
+            this.setStatus(TaskStatus.NEW);
+        } else {
             if (this.checkWhetherEpicTaskIsDone()) {
                 this.setStatus(TaskStatus.DONE);
             } else {
@@ -51,19 +50,23 @@ public class EpicTask extends Task {
         }
     }
 
+    private boolean checkWhetherEpicTaskContainsSubTask(SubTask subTask) {
+        return mapOfSubTasksForEpicTask.containsKey(subTask.getId());
+    }
+
+    //NOTE: This method RENEWS subtask in epic task
+    public void renewSubTaskInEpicTask(SubTask subTask) {
+        if(checkWhetherEpicTaskContainsSubTask(subTask)) {
+            mapOfSubTasksForEpicTask.put(subTask.getId(), subTask);
+            setEpicTaskStatus();
+        }
+    }
+
+    //NOTE: This method REMOVES subtask from epic task
     public void removeSubTaskInEpicTask(SubTask subTask) {
-        if(mapOfSubTasksForEpicTask.containsKey(subTask.getId())) {
-            int subTaskId = subTask.getId();
-            mapOfSubTasksForEpicTask.remove(subTaskId);
-            if (mapOfSubTasksForEpicTask.isEmpty()) {
-                this.setStatus(TaskStatus.NEW);
-            } else {
-                if (this.checkWhetherEpicTaskIsDone()) {
-                    this.setStatus(TaskStatus.DONE);
-                } else {
-                    this.setStatus(TaskStatus.IN_PROGRESS);
-                }
-            }
+        if(checkWhetherEpicTaskContainsSubTask(subTask)) {
+            mapOfSubTasksForEpicTask.remove(subTask.getId());
+            setEpicTaskStatus();
         }
     }
 
