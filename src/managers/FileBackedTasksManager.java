@@ -6,9 +6,14 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+    private final static String DATE_TIME_FORMAT = "[dd.MM.yyyy]/[HH:mm]";
     private final String fileName;
 
     public FileBackedTasksManager(File file) {
@@ -22,18 +27,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         this.mapOfEpicTasks = inMemoryTaskManager.mapOfEpicTasks;
         this.taskId = inMemoryTaskManager.taskId;
         this.defaultHistory = inMemoryTaskManager.defaultHistory;
-
+        this.priorityComparator = inMemoryTaskManager.priorityComparator;
+        this.setOfPrioritizedTasksAndSubtasks = inMemoryTaskManager.setOfPrioritizedTasksAndSubtasks;
+        this.slotsValidationMap = inMemoryTaskManager.slotsValidationMap;
     }
 
     private void save() throws ManagerSaveException{
         try (FileWriter fileWriter = new FileWriter(fileName, StandardCharsets.UTF_8, false)) {
-            fileWriter.write("id,type,name,status,description,epic\n");
-            Comparator<Integer> taskComparator = new Comparator<>() {
-                @Override
-                public int compare(Integer id1, Integer id2) {
-                    return id1 - id2;
-                }
-            };
+            fileWriter.write("id,type,name,status,description,startTime,duration,endTime,epic\n");
+            Comparator<Integer> taskComparator = Comparator.comparingInt(id -> id);
             Map<Integer, Task> mapOfAllTasks = new TreeMap<>(taskComparator);
             for(Integer id : mapOfTasks.keySet()) {
                 mapOfAllTasks.put(id, mapOfTasks.get(id));
@@ -48,22 +50,34 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 String taskString = taskToString(task);
                 fileWriter.write(taskString);
             }
-            fileWriter.write("\n");
-            fileWriter.write(historyToString(defaultHistory));
+            fileWriter.write(" \n");
+            if(this.getHistoryManager().getHistory().size() == 0) {
+                fileWriter.write(" \n");
+            } else {
+                fileWriter.write(historyToString(defaultHistory));
+            }
         } catch (IOException e) {
             System.out.println("Ошибка записи");
             throw new ManagerSaveException("Ошибка сохранения состояния TaskManager в файл");
         }
     }
 
+    private String timeDateToString(LocalDateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+        return dateTime.format(formatter);
+    }
+
     private String taskToString(Task task) {
         String taskString;
         if(task.getType().equals(TaskType.SUBTASK)) {
-            taskString = String.format("%d,%s,%s,%s,%s,%d%n", task.getId(), task.getType(), task.getName(),
-                    task.getStatus(), task.getDescription(), ((SubTask)task).getEpicTaskId());
+            taskString = String.format("%d,%s,%s,%s,%s,%s,%d,%s,%d%n", task.getId(), task.getType(), task.getName(),
+                    task.getStatus(), task.getDescription(), timeDateToString(task.getStartTime()),
+                    task.getDuration().toMinutes(), timeDateToString(task.getEndTime()),
+                    ((SubTask)task).getEpicTaskId());
         } else {
-            taskString = String.format("%d,%s,%s,%s,%s%n", task.getId(), task.getType(), task.getName(),
-                    task.getStatus(), task.getDescription());
+            taskString = String.format("%d,%s,%s,%s,%s,%s,%d,%s,%n", task.getId(), task.getType(), task.getName(),
+                    task.getStatus(), task.getDescription(), timeDateToString(task.getStartTime()),
+                    task.getDuration().toMinutes(), timeDateToString(task.getEndTime()));
         }
         return taskString;
     }
@@ -76,38 +90,56 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return String.join(",", historyIdStrings);
     }
 
+    private static LocalDateTime stringToDateTime(String string) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+        return LocalDateTime.parse(string, formatter);
+    }
+
+    private static Duration stringToDuration(String duration) {
+        long minutesDuration = Long.parseLong(duration);
+        return Duration.ofMinutes(minutesDuration);
+    }
     private static Task stringToTask(String string) {
         String[] values = string.split(",");
         switch (TaskType.valueOf(values[1])) {
             case TASK:
-                return new Task(values[2], values[4], TaskStatus.valueOf(values[3]), TaskType.valueOf(values[1]));
+                return new Task(values[2], values[4], TaskStatus.valueOf(values[3]), TaskType.valueOf(values[1]),
+                        stringToDateTime(values[5]), stringToDuration(values[6]));
             case SUBTASK:
                 return new SubTask(values[2], values[4], TaskStatus.valueOf(values[3]),
-                        Integer.parseInt(values[5]), TaskType.valueOf(values[1]));
+                        Integer.parseInt(values[8]), TaskType.valueOf(values[1]), stringToDateTime(values[5]),
+                        stringToDuration(values[6]));
             case EPIC:
-                return new EpicTask(values[2], values[4], TaskStatus.valueOf(values[3]), TaskType.valueOf(values[1]));
+                return new EpicTask(values[2], values[4], TaskStatus.valueOf(values[3]), TaskType.valueOf(values[1]),
+                        stringToDateTime(values[5]), stringToDuration(values[6]));
         }
         return null;
     }
 
 
     private static List<Integer> historyFromString(String value) {
-        String[] taskIdsInHistory = value.split(",");
-        List<Integer> listOfTaskIdsInHistory = new ArrayList<>();
-        for (String s : taskIdsInHistory) {
-            listOfTaskIdsInHistory.add(Integer.parseInt(s));
+        if (!value.isBlank()) {
+            String[] taskIdsInHistory = value.split(",");
+            List<Integer> listOfTaskIdsInHistory = new ArrayList<>();
+            for (String s : taskIdsInHistory) {
+                listOfTaskIdsInHistory.add(Integer.parseInt(s));
+            }
+            return listOfTaskIdsInHistory;
+        } else {
+            return new ArrayList<>();
         }
-        return listOfTaskIdsInHistory;
     }
 
     private static void loadHistoryToBuffer(List<Integer> listOfTaskIds, InMemoryTaskManager bufferKanban) {
-        for(Integer id : listOfTaskIds) {
-            if(bufferKanban.mapOfTasks.containsKey(id)) {
-                bufferKanban.getTask(id);
-            } else if (bufferKanban.mapOfSubTasks.containsKey(id)) {
-                bufferKanban.getSubTask(id);
-            } else if (bufferKanban.mapOfEpicTasks.containsKey(id)) {
-                bufferKanban.getEpicTask(id);
+        if(!listOfTaskIds.isEmpty()) {
+            for (Integer id : listOfTaskIds) {
+                if (bufferKanban.mapOfTasks.containsKey(id)) {
+                    bufferKanban.getTask(id);
+                } else if (bufferKanban.mapOfSubTasks.containsKey(id)) {
+                    bufferKanban.getSubTask(id);
+                } else if (bufferKanban.mapOfEpicTasks.containsKey(id)) {
+                    bufferKanban.getEpicTask(id);
+                }
             }
         }
     }
@@ -142,11 +174,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                     if (task != null) {
                         switch(task.getType()) {
                             case TASK:
-                                bufferKanban.createTask(task.getName(), task.getDescription(), task.getStatus());
+                                bufferKanban.createTask(task.getName(), task.getDescription(), task.getStatus(),
+                                        task.getStartTime(), task.getDuration());
                                 break;
                             case SUBTASK:
                                 bufferKanban.createSubTask(task.getName(), task.getDescription(), task.getStatus(),
-                                    ((SubTask) task).getEpicTaskId());
+                                    ((SubTask) task).getEpicTaskId(), task.getStartTime(), task.getDuration());
                                 break;
                             case EPIC:
                                 bufferKanban.createEpicTask(task.getName(), task.getDescription(), task.getStatus());
@@ -159,8 +192,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public void createTask(String name, String description, TaskStatus status) {
-        super.createTask(name, description, status);
+    public void createTask(String name, String description, TaskStatus status, LocalDateTime startTime,
+                           Duration duration) {
+        super.createTask(name, description, status, startTime, duration);
         save();
     }
 
@@ -171,8 +205,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public void createSubTask(String name, String description, TaskStatus status, int epicTaskId) {
-        super.createSubTask(name, description, status, epicTaskId);
+    public void createSubTask(String name, String description, TaskStatus status, int epicTaskId,
+                              LocalDateTime startTime, Duration duration) {
+        super.createSubTask(name, description, status, epicTaskId, startTime, duration);
         save();
     }
 
@@ -242,5 +277,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public void removeEpicTask (Integer id) {
         super.removeEpicTask(id);
         save();
+    }
+
+    @Override
+    public void clearAll() {
+        super.clearAll();
+        try {
+            Files.newBufferedWriter(Path.of(fileName), StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            System.out.println("Невозможно очистить файл.");
+        }
     }
 }

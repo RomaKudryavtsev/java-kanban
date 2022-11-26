@@ -61,6 +61,15 @@ public class InMemoryHistoryManager implements HistoryManager {
         return listOfTasksFromHistory;
     }
 
+    private void removeAllTasks() {
+        Node<Task> currentNode = this.tail;
+        for(int i = sizeOfCustomLinkedList; i >= 1; --i) {
+            Node<Task> buffer = new Node<>(currentNode.prev, currentNode.data, currentNode.next);
+            removeNode(currentNode);
+            currentNode = buffer.prev;
+        }
+    }
+
     @Override
     public void add(Task task) {
         if(sizeOfCustomLinkedList < SIZE_OF_HISTORY) {
@@ -73,7 +82,6 @@ public class InMemoryHistoryManager implements HistoryManager {
                 removeNode(head);
                 linkLast(task);
             } else {
-                removeNode(head);
                 removeNode(tasksIdsAndNodes.get(task.getId()));
                 linkLast(task);
             }
@@ -82,7 +90,15 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        removeNode(tasksIdsAndNodes.remove(id));
+        if(!tasksIdsAndNodes.isEmpty()) {
+            removeNode(tasksIdsAndNodes.remove(id));
+        }
+    }
+
+    @Override
+    public void removeAll() {
+        removeAllTasks();
+        tasksIdsAndNodes.clear();
     }
 
     @Override

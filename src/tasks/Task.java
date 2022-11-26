@@ -1,13 +1,19 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
+    protected static final LocalDateTime DEFAULT_START_TIME =
+            LocalDateTime.of(2000, 1, 1, 0, 0);
     protected String name;
     protected String description;
     protected int id;
     protected TaskStatus status;
     protected TaskType type;
+    protected LocalDateTime startTime = DEFAULT_START_TIME;
+    protected Duration duration = Duration.ofMinutes(0);
 
     public Task(String name, String description, TaskStatus status) {
         this.name = name;
@@ -27,6 +33,27 @@ public class Task {
         this.description = description;
         this.status = status;
         this.type = type;
+    }
+
+    public Task(String name, String description, TaskStatus status, TaskType type, LocalDateTime startTime,
+                Duration duration) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.type = type;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
+    public Task(String name, String description, TaskStatus status, TaskType type, LocalDateTime startTime,
+                Duration duration, int id) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.type = type;
+        this.startTime = startTime;
+        this.duration = duration;
+        this.id = id;
     }
 
     public String getName() {
@@ -57,14 +84,28 @@ public class Task {
         this.status = status;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plusMinutes(duration.toMinutes());
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
     @Override
     public String toString() {
-        return "{" +
+        return "Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", status=" + status +
                 ", type=" + type +
+                ", startTime=" + startTime +
+                ", duration=" + duration +
                 '}';
     }
 

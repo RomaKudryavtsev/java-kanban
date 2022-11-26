@@ -1,14 +1,19 @@
 package managers;
 
 import tasks.*;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
-        void createTask(String name, String description, TaskStatus status);
+        void createTask(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration);
 
         void createEpicTask(String name, String description, TaskStatus status);
 
-        void createSubTask(String name, String description, TaskStatus status, int epicTaskId);
+        void createSubTask(String name, String description, TaskStatus status, int epicTaskId, LocalDateTime startTime,
+                           Duration duration);
 
         ArrayList<Task> getListOfTasks();
 
@@ -41,4 +46,8 @@ public interface TaskManager {
         ArrayList<SubTask> getListOfSubTasksForEpicTask(Integer id);
 
         HistoryManager getHistoryManager();
+
+        List<Task> getPrioritizedTasks();
+
+        void clearAll();
 }

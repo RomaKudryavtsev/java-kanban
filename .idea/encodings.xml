@@ -8,5 +8,6 @@
     <file url="file://$PROJECT_DIR$/src/tasks/SubTask.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/tasks/Task.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/tasks/TaskStatus.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/tests/TaskManagerTest.java" charset="UTF-8" />
   </component>
 </project>

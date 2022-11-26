@@ -1,7 +1,10 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
-    private int epicTaskId;
+    private final int epicTaskId;
 
     public SubTask(String name, String description, TaskStatus status, int epicTaskId) {
         super(name, description, status);
@@ -18,11 +21,19 @@ public class SubTask extends Task {
         this.epicTaskId = epicTaskId;
     }
 
-    public int getEpicTaskId() {
-        return epicTaskId;
+    public SubTask(String name, String description, TaskStatus status, int epicTaskId, TaskType type,
+                   LocalDateTime startTime, Duration duration) {
+        super(name, description, status, type, startTime, duration);
+        this.epicTaskId = epicTaskId;
     }
 
-    public void setEpicTaskId(int epicTaskId) {
+    public SubTask(String name, String description, TaskStatus status, int epicTaskId, TaskType type,
+                   LocalDateTime startTime, Duration duration, int id) {
+        super(name, description, status, type, startTime, duration, id);
         this.epicTaskId = epicTaskId;
+    }
+
+    public int getEpicTaskId() {
+        return epicTaskId;
     }
 }
