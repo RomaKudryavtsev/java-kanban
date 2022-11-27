@@ -152,51 +152,49 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         }
     }
 
+    private boolean compareExpectedAndActualNumberOfTasks(int expected, int result) {
+        if (expected == result) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Test
     void loadFromFileWithTasksAndHistory() {
         kanban.getTask(1);
         kanban.getEpicTask(3);
         kanban.getSubTask(5);
         TaskManager kanbanInstantiatedFromFile = FileBackedTasksManager.loadFromFile(f);
-        int expectedNumberOfTasks = 2;
-        int resultNumberOfTasks = kanbanInstantiatedFromFile.getListOfTasks().size();
-        Assertions.assertEquals(expectedNumberOfTasks, resultNumberOfTasks);
-        int expectedNumberOfSubTasks = 3;
-        int resultNumberOfSubtasks = kanbanInstantiatedFromFile.getListOfSubTasks().size();
-        Assertions.assertEquals(expectedNumberOfSubTasks, resultNumberOfSubtasks);
-        int expectedNumberOfEpicTasks = 2;
-        int resultNumberOfEpicTasks = kanbanInstantiatedFromFile.getListOfEpicTasks().size();
-        Assertions.assertEquals(expectedNumberOfEpicTasks, resultNumberOfEpicTasks);
-        int expectedHistorySize = 3;
-        int resultHistorySize = kanbanInstantiatedFromFile.getHistoryManager().getHistory().size();
-        Assertions.assertEquals(expectedHistorySize, resultHistorySize);
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(2,
+                kanbanInstantiatedFromFile.getNumberOfTasks()));
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(3,
+                kanbanInstantiatedFromFile.getNumberOfSubtasks()));
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(2,
+                kanbanInstantiatedFromFile.getNumberOfEpicTasks()));
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(3,
+                kanbanInstantiatedFromFile.getHistoryManager().getHistory().size()));
     }
 
     @Test
     void loadFromFileNoTasksCreated() {
         kanban.clearAll();
         TaskManager kanbanInstantiatedFromFile = FileBackedTasksManager.loadFromFile(f);
-        int expectedNumberOfTasks = 0;
-        int resultNumberOfTasks = kanbanInstantiatedFromFile.getListOfTasks().size();
-        Assertions.assertEquals(expectedNumberOfTasks, resultNumberOfTasks);
-        int expectedNumberOfSubTasks = 0;
-        int resultNumberOfSubtasks = kanbanInstantiatedFromFile.getListOfSubTasks().size();
-        Assertions.assertEquals(expectedNumberOfSubTasks, resultNumberOfSubtasks);
-        int expectedNumberOfEpicTasks = 0;
-        int resultNumberOfEpicTasks = kanbanInstantiatedFromFile.getListOfEpicTasks().size();
-        Assertions.assertEquals(expectedNumberOfEpicTasks, resultNumberOfEpicTasks);
-        int expectedHistorySize = 0;
-        int resultHistorySize = kanbanInstantiatedFromFile.getHistoryManager().getHistory().size();
-        Assertions.assertEquals(expectedHistorySize, resultHistorySize);
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(0,
+                kanbanInstantiatedFromFile.getNumberOfTasks()));
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(0,
+                kanbanInstantiatedFromFile.getNumberOfSubtasks()));
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(0,
+                kanbanInstantiatedFromFile.getNumberOfEpicTasks()));
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(0,
+                kanbanInstantiatedFromFile.getHistoryManager().getHistory().size()));
     }
 
     @Test
     void loadFromFileEmptyHistory() {
         TaskManager kanbanInstantiatedFromFile = FileBackedTasksManager.loadFromFile(f);
-        int expectedHistorySize = 0;
-        int resultHistorySize = kanbanInstantiatedFromFile.getHistoryManager().getHistory().size();
-        Assertions.assertEquals(expectedHistorySize, resultHistorySize);
-        //если пустая история, нужно при save все равно создавать пустые строчки
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(0,
+                kanbanInstantiatedFromFile.getHistoryManager().getHistory().size()));
     }
 
     @Test
@@ -205,11 +203,9 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         kanban.createEpicTask("E1", "EE1", TaskStatus.NEW);
         kanban.getEpicTask(1);
         TaskManager kanbanInstantiatedFromFile = FileBackedTasksManager.loadFromFile(f);
-        int expectedNumberOfEpicTasks = 1;
-        int resultNumberOfEpicTasks = kanbanInstantiatedFromFile.getListOfEpicTasks().size();
-        Assertions.assertEquals(expectedNumberOfEpicTasks, resultNumberOfEpicTasks);
-        int expectedNumberOfSubtasks = 0;
-        int resultNumberOfSubtasks = kanbanInstantiatedFromFile.getListOfSubTasks().size();
-        Assertions.assertEquals(expectedNumberOfSubtasks, resultNumberOfSubtasks);
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(1,
+                kanbanInstantiatedFromFile.getNumberOfEpicTasks()));
+        Assertions.assertTrue(compareExpectedAndActualNumberOfTasks(0,
+                kanbanInstantiatedFromFile.getNumberOfSubtasks()));
     }
 }

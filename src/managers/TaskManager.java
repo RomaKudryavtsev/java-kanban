@@ -50,4 +50,10 @@ public interface TaskManager {
         List<Task> getPrioritizedTasks();
 
         void clearAll();
+
+        int getNumberOfTasks();
+
+        int getNumberOfSubtasks();
+
+        int getNumberOfEpicTasks();
 }

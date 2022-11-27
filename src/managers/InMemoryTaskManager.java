@@ -355,4 +355,19 @@ public class InMemoryTaskManager implements TaskManager {
             slotsValidationMap.clear();
         }
     }
+
+    @Override
+    public int getNumberOfTasks() {
+        return mapOfTasks.size();
+    }
+
+    @Override
+    public int getNumberOfSubtasks() {
+        return mapOfSubTasks.size();
+    }
+
+    @Override
+    public int getNumberOfEpicTasks() {
+        return mapOfEpicTasks.size();
+    }
 }
