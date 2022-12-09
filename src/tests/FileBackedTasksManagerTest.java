@@ -44,6 +44,21 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         kanban.clearAll();
     }
 
+    private String[] getExpectedStringArray() {
+        return new String[]{
+                "id,type,name,status,description,startTime,duration,endTime,epic",
+                "1,TASK,T1,NEW,TT1,19.11.2022/12:00,10,19.11.2022/12:10,",
+                "2,TASK,T2,NEW,TT2,19.11.2022/09:00,30,19.11.2022/09:30,",
+                "3,EPIC,E3,NEW,EE3,20.11.2022/20:00,165,21.11.2022/15:45,",
+                "4,EPIC,E4,NEW,EE4,21.11.2022/09:00,15,21.11.2022/09:15,",
+                "5,SUBTASK,S5,NEW,SS5,20.11.2022/20:00,120,20.11.2022/22:00,3",
+                "6,SUBTASK,S6,NEW,SS6,21.11.2022/15:00,45,21.11.2022/15:45,3",
+                "7,SUBTASK,S7,NEW,SS7,21.11.2022/09:00,15,21.11.2022/09:15,4",
+                " ",
+                "1,3,5"
+        };
+    }
+
     @Test
     void saveWithTasksAndHistory() {
         kanban.getTask(1);
@@ -51,37 +66,11 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         kanban.getSubTask(5);
         try {
             String fileString = Files.readString(path);
-            String[] lines = fileString.split("\r?\n");
-            String expectedLine1 = "id,type,name,status,description,startTime,duration,endTime,epic";
-            String resultLine1 = lines[0];
-            Assertions.assertEquals(expectedLine1, resultLine1);
-            String expectedLine2 = "1,TASK,T1,NEW,TT1,19.11.2022/12:00,10,19.11.2022/12:10,";
-            String resultLine2 = lines[1];
-            Assertions.assertEquals(expectedLine2, resultLine2);
-            String expectedLine3 = "2,TASK,T2,NEW,TT2,19.11.2022/09:00,30,19.11.2022/09:30,";
-            String resultLine3 = lines[2];
-            Assertions.assertEquals(expectedLine3, resultLine3);
-            String expectedLine4 = "3,EPIC,E3,NEW,EE3,20.11.2022/20:00,165,21.11.2022/15:45,";
-            String resultLine4 = lines[3];
-            Assertions.assertEquals(expectedLine4, resultLine4);
-            String expectedLine5 = "4,EPIC,E4,NEW,EE4,21.11.2022/09:00,15,21.11.2022/09:15,";
-            String resultLine5 = lines[4];
-            Assertions.assertEquals(expectedLine5, resultLine5);
-            String expectedLine6 = "5,SUBTASK,S5,NEW,SS5,20.11.2022/20:00,120,20.11.2022/22:00,3";
-            String resultLine6 = lines[5];
-            Assertions.assertEquals(expectedLine6, resultLine6);
-            String expectedLine7 = "6,SUBTASK,S6,NEW,SS6,21.11.2022/15:00,45,21.11.2022/15:45,3";
-            String resultLine7 = lines[6];
-            Assertions.assertEquals(expectedLine7, resultLine7);
-            String expectedLine8 = "7,SUBTASK,S7,NEW,SS7,21.11.2022/09:00,15,21.11.2022/09:15,4";
-            String resultLine8 = lines[7];
-            Assertions.assertEquals(expectedLine8, resultLine8);
-            String expectedLine9 = " ";
-            String resultLine9 = lines[8];
-            Assertions.assertEquals(expectedLine9, resultLine9);
-            String expectedLine10 = "1,3,5";
-            String resultLine10 = lines[9];
-            Assertions.assertEquals(expectedLine10, resultLine10);
+            String[] resultStringArray = fileString.split("\r?\n");
+            String[] expectedStringArray = getExpectedStringArray();
+            for(int i = 0; i < resultStringArray.length; ++i) {
+                Assertions.assertEquals(expectedStringArray[i], resultStringArray[i]);
+            }
         } catch (IOException e) {
             System.out.println("Невозможно прочитать файл.");
         }

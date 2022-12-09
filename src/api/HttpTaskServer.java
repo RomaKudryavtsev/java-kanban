@@ -25,12 +25,13 @@ public class HttpTaskServer {
     String url;
     TaskManager httpKanban;
     private static final int PORT = 8080;
+    private static final String URL_TO_KV_SERVER = "http://localhost:8078";
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private static Gson gson;
     private final HttpServer server;
 
     public HttpTaskServer() throws IOException {
-        url = "http://localhost:8078";
+        url = URL_TO_KV_SERVER;
         httpKanban = Managers.getDefault(url);
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer());
@@ -42,7 +43,7 @@ public class HttpTaskServer {
     }
 
     public HttpTaskServer(HttpTaskManager httpKanban) throws IOException {
-        url = "http://localhost:8078";
+        url = URL_TO_KV_SERVER;
         this.httpKanban = httpKanban;
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer());
