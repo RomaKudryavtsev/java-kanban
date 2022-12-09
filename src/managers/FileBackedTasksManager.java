@@ -14,13 +14,17 @@ import java.util.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
     private final static String DATE_TIME_FORMAT = "[dd.MM.yyyy]/[HH:mm]";
-    private final String fileName;
+    protected final String fileName;
+
+    public FileBackedTasksManager(String fileName) {
+        this.fileName = fileName;
+    }
 
     public FileBackedTasksManager(File file) {
         this.fileName = file.getName();
     }
 
-    private FileBackedTasksManager(String fileName, InMemoryTaskManager inMemoryTaskManager) {
+    protected FileBackedTasksManager(String fileName, InMemoryTaskManager inMemoryTaskManager) {
         this.fileName = fileName;
         this.mapOfTasks = inMemoryTaskManager.mapOfTasks;
         this.mapOfSubTasks = inMemoryTaskManager.mapOfSubTasks;
@@ -32,7 +36,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         this.slotsValidationMap = inMemoryTaskManager.slotsValidationMap;
     }
 
-    private void save() throws ManagerSaveException{
+    protected void save() throws ManagerSaveException{
         try (FileWriter fileWriter = new FileWriter(fileName, StandardCharsets.UTF_8, false)) {
             fileWriter.write("id,type,name,status,description,startTime,duration,endTime,epic\n");
             Comparator<Integer> taskComparator = Comparator.comparingInt(id -> id);
@@ -281,7 +285,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     @Override
     public void clearAll() {
-        super.clearAll();
+        this.clearAllData();
         try {
             Files.newBufferedWriter(Path.of(fileName), StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {

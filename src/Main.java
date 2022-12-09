@@ -1,55 +1,55 @@
-import managers.FileBackedTasksManager;
-import managers.Managers;
-import managers.TaskManager;
+import api.HttpTaskServer;
+import api.KVServer;
+import managers.HttpTaskManager;
 import tasks.Task;
 import tasks.TaskStatus;
 
-import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        // TaskManager is instantiated with empty file
+    public static void main(String[] args) throws IOException {
         {
-            File f = new File("kanban back-up file.csv");
-            TaskManager kanbanBacked = new Managers().getFileBacked(f);
-            kanbanBacked.createTask("Сделать домашку по ивриту", "См. стр. 33 учебника", TaskStatus.NEW,
-                    LocalDateTime.of(2022, 11, 19, 20, 0), Duration.ofMinutes(120));
-            kanbanBacked.createTask("Убраться дома", "Помыть пол", TaskStatus.NEW,
-                    LocalDateTime.of(2022, 11, 19, 12, 0), Duration.ofMinutes(180));
-            kanbanBacked.createEpicTask("Сдать финальное задание Практикума", "Проект канбана",
-                    TaskStatus.NEW);
-            kanbanBacked.createEpicTask("Подтвердить диплом",
-                    "Подтверждение диплома в министерстве образования", TaskStatus.NEW);
-            kanbanBacked.createSubTask("Подготовить код", "См. ТЗ 3го спринта", TaskStatus.NEW, 3,
-                    LocalDateTime.of(2022, 11, 20, 13, 0), Duration.ofMinutes(120));
-            kanbanBacked.createSubTask("Проверить код стайл", "См. правила код стайла", TaskStatus.NEW,
-                    3, LocalDateTime.of(2022, 11, 20, 15, 0),
-                    Duration.ofMinutes(120));
-            kanbanBacked.createSubTask("Получить подтверждение в министерстве абсорбции",
-                    "Сходить к координатору", TaskStatus.NEW, 4,
-                    LocalDateTime.of(2022, 11, 21, 9, 0), Duration.ofMinutes(90));
-            kanbanBacked.getTask(1);
-            kanbanBacked.getEpicTask(3);
-            kanbanBacked.getSubTask(5);
+            //Requests to HttpTaskManager via HttpTaskServer using Insomnia
+            KVServer repoServer = new KVServer();
+            repoServer.start();
+            HttpTaskServer taskServer = new HttpTaskServer();
+            taskServer.start();
+            //NOTE: To test in Insomnia - please comment the following stop-lines.
+            repoServer.stop();
+            taskServer.stop();
         }
-        //TaskManager is instantiated from file
+
         {
-            File f = new File("kanban back-up file.csv");
-            TaskManager kanbanBacked = FileBackedTasksManager.loadFromFile(f);
             ListOfTasksPrinter printer = new ListOfTasksPrinter();
-            System.out.println("Список задач:");
-            printer.printList(kanbanBacked.getListOfTasks());
-            System.out.println("Список эпиков:");
-            printer.printList(kanbanBacked.getListOfEpicTasks());
-            System.out.println("Список подзадач:");
-            printer.printList(kanbanBacked.getListOfSubTasks());
-            System.out.println("История просмотров:");
-            printer.printList(kanbanBacked.getHistoryManager().getHistory());
-            System.out.println("Список задач и подзадач по приоритету:");
-            printer.printList(kanbanBacked.getPrioritizedTasks());
+
+            KVServer server = new KVServer();
+            server.start();
+            //Serialization using the server
+            HttpTaskManager kanban = new HttpTaskManager("http://localhost:8078");
+
+            kanban.createTask("T1", "TT1", TaskStatus.NEW,
+                    LocalDateTime.of(2022, 1, 1, 0, 0), Duration.ofMinutes(120));
+            kanban.createEpicTask("E1", "EE1", TaskStatus.NEW);
+            kanban.createSubTask("S1", "SS1", TaskStatus.NEW, 2,
+                    LocalDateTime.of(2022, 2, 1, 0, 0), Duration.ofMinutes(120));
+            kanban.getTask(1);
+            kanban.getSubTask(3);
+            kanban.getEpicTask(2);
+            //Deserialization using the same server
+            HttpTaskManager kanbanFromServer = HttpTaskManager.loadFromServer("http://localhost:8078");
+            System.out.println("List of tasks:");
+            printer.printList(kanbanFromServer.getListOfTasks());
+            System.out.println("List of epics:");
+            printer.printList(kanbanFromServer.getListOfEpicTasks());
+            System.out.println("List of subtasks:");
+            printer.printList(kanbanFromServer.getListOfSubTasks());
+            System.out.println("History:");
+            printer.printList(kanbanFromServer.getHistoryManager().getHistory());
+
+            server.stop();
         }
     }
 }

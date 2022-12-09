@@ -333,8 +333,7 @@ public class InMemoryTaskManager implements TaskManager {
         return defaultHistory;
     }
 
-    @Override
-    public void clearAll() {
+    protected void clearAllData() {
         if(!mapOfTasks.isEmpty()) {
             mapOfTasks.clear();
         }
@@ -354,6 +353,10 @@ public class InMemoryTaskManager implements TaskManager {
         if(!slotsValidationMap.isEmpty()) {
             slotsValidationMap.clear();
         }
+    }
+    @Override
+    public void clearAll() {
+        this.clearAllData();
     }
 
     @Override

@@ -16,7 +16,7 @@ class InMemoryHistoryManagerTest {
 
     @BeforeEach
     public void beforeEachInHistory() {
-        kanban = Managers.getDefault();
+        kanban = Managers.getInMemory();
         kanban.createTask("T1", "TT1", TaskStatus.NEW,
                 LocalDateTime.of(2022, 11, 19, 12, 0), Duration.ofMinutes(10));
         kanban.createEpicTask("E2", "EE2", TaskStatus.NEW);

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     @BeforeEach
     public void beforeEachInMemory() {
-        kanban = Managers.getDefault();
+        kanban = Managers.getInMemory();
         kanban.createTask("T1", "TT1", TaskStatus.NEW,
                 LocalDateTime.of(2022, 11, 19, 12, 0), Duration.ofMinutes(10));
         kanban.createTask("T2", "TT2", TaskStatus.NEW,

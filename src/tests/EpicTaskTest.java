@@ -18,7 +18,7 @@ class EpicTaskTest {
 
     @BeforeEach
     public void beforeEach() {
-        kanban = Managers.getDefault();
+        kanban = Managers.getInMemory();
         kanban.createEpicTask("E1", "EE1", TaskStatus.NEW);
     }
 

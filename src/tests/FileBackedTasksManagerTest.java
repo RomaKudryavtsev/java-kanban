@@ -153,11 +153,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     private boolean compareExpectedAndActualNumberOfTasks(int expected, int result) {
-        if (expected == result) {
-            return true;
-        } else {
-            return false;
-        }
+        return expected == result;
     }
 
     @Test
