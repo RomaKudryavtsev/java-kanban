@@ -52,7 +52,7 @@ public class Main {
     }
 }
 
-class ListOfTasksPrinter <T extends Task> {
+class ListOfTasksPrinter<T extends Task> {
     public void printList(List<T> listOfTasks) {
         if (listOfTasks.isEmpty()) {
             System.out.println("Список пуст");

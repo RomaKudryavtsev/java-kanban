@@ -56,12 +56,12 @@ public class HttpTaskServer {
 
     public void start() {
         server.start();
-        System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
+        System.out.println("HTTP-server is started on " + PORT + " port!");
     }
 
     public void stop() {
         server.stop(0);
-        System.out.println("HTTP-сервер остановлен на " + PORT + " порту!");
+        System.out.println("HTTP-server is stopped on " + PORT + " port!");
     }
 
     static class TasksHandler implements HttpHandler {

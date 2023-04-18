@@ -8,52 +8,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {
-        void createTask(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration);
+    void createTask(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration);
 
-        void createEpicTask(String name, String description, TaskStatus status);
+    void createEpicTask(String name, String description, TaskStatus status);
 
-        void createSubTask(String name, String description, TaskStatus status, int epicTaskId, LocalDateTime startTime,
-                           Duration duration);
+    void createSubTask(String name, String description, TaskStatus status, int epicTaskId, LocalDateTime startTime,
+                       Duration duration);
 
-        ArrayList<Task> getListOfTasks();
+    ArrayList<Task> getListOfTasks();
 
-        ArrayList<SubTask> getListOfSubTasks();
+    ArrayList<SubTask> getListOfSubTasks();
 
-        ArrayList<EpicTask> getListOfEpicTasks();
+    ArrayList<EpicTask> getListOfEpicTasks();
 
-        Task getTask(Integer id);
+    Task getTask(Integer id);
 
-        SubTask getSubTask(Integer id);
+    SubTask getSubTask(Integer id);
 
-        EpicTask getEpicTask(Integer id);
+    EpicTask getEpicTask(Integer id);
 
-        void renewTask(Task task);
+    void renewTask(Task task);
 
-        void renewSubTask(SubTask subTask);
+    void renewSubTask(SubTask subTask);
 
-        void clearListOfTasks();
+    void clearListOfTasks();
 
-        void clearListOfSubtasks();
+    void clearListOfSubtasks();
 
-        void clearListOfEpicTasks();
+    void clearListOfEpicTasks();
 
-        void removeTask(Integer id);
+    void removeTask(Integer id);
 
-        void removeSubTask(Integer id);
+    void removeSubTask(Integer id);
 
-        void removeEpicTask (Integer id);
+    void removeEpicTask(Integer id);
 
-        ArrayList<SubTask> getListOfSubTasksForEpicTask(Integer id);
+    ArrayList<SubTask> getListOfSubTasksForEpicTask(Integer id);
 
-        HistoryManager getHistoryManager();
+    HistoryManager getHistoryManager();
 
-        List<Task> getPrioritizedTasks();
+    List<Task> getPrioritizedTasks();
 
-        void clearAll();
+    void clearAll();
 
-        int getNumberOfTasks();
+    int getNumberOfTasks();
 
-        int getNumberOfSubtasks();
+    int getNumberOfSubtasks();
 
-        int getNumberOfEpicTasks();
+    int getNumberOfEpicTasks();
 }

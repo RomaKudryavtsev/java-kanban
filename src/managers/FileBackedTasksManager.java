@@ -36,33 +36,33 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         this.slotsValidationMap = inMemoryTaskManager.slotsValidationMap;
     }
 
-    protected void save() throws ManagerSaveException{
+    protected void save() throws ManagerSaveException {
         try (FileWriter fileWriter = new FileWriter(fileName, StandardCharsets.UTF_8, false)) {
             fileWriter.write("id,type,name,status,description,startTime,duration,endTime,epic\n");
             Comparator<Integer> taskComparator = Comparator.comparingInt(id -> id);
             Map<Integer, Task> mapOfAllTasks = new TreeMap<>(taskComparator);
-            for(Integer id : mapOfTasks.keySet()) {
+            for (Integer id : mapOfTasks.keySet()) {
                 mapOfAllTasks.put(id, mapOfTasks.get(id));
             }
-            for(Integer id : mapOfSubTasks.keySet()) {
+            for (Integer id : mapOfSubTasks.keySet()) {
                 mapOfAllTasks.put(id, mapOfSubTasks.get(id));
             }
-            for(Integer id : mapOfEpicTasks.keySet()) {
+            for (Integer id : mapOfEpicTasks.keySet()) {
                 mapOfAllTasks.put(id, mapOfEpicTasks.get(id));
             }
-            for(Task task : mapOfAllTasks.values()) {
+            for (Task task : mapOfAllTasks.values()) {
                 String taskString = taskToString(task);
                 fileWriter.write(taskString);
             }
             fileWriter.write(" \n");
-            if(this.getHistoryManager().getHistory().size() == 0) {
+            if (this.getHistoryManager().getHistory().size() == 0) {
                 fileWriter.write(" \n");
             } else {
                 fileWriter.write(historyToString(defaultHistory));
             }
         } catch (IOException e) {
-            System.out.println("Ошибка записи");
-            throw new ManagerSaveException("Ошибка сохранения состояния TaskManager в файл");
+            System.out.println("Recording error");
+            throw new ManagerSaveException("Error occurred upon try to save TaskManager state into file");
         }
     }
 
@@ -73,11 +73,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     private String taskToString(Task task) {
         String taskString;
-        if(task.getType().equals(TaskType.SUBTASK)) {
+        if (task.getType().equals(TaskType.SUBTASK)) {
             taskString = String.format("%d,%s,%s,%s,%s,%s,%d,%s,%d%n", task.getId(), task.getType(), task.getName(),
                     task.getStatus(), task.getDescription(), timeDateToString(task.getStartTime()),
                     task.getDuration().toMinutes(), timeDateToString(task.getEndTime()),
-                    ((SubTask)task).getEpicTaskId());
+                    ((SubTask) task).getEpicTaskId());
         } else {
             taskString = String.format("%d,%s,%s,%s,%s,%s,%d,%s,%n", task.getId(), task.getType(), task.getName(),
                     task.getStatus(), task.getDescription(), timeDateToString(task.getStartTime()),
@@ -103,6 +103,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         long minutesDuration = Long.parseLong(duration);
         return Duration.ofMinutes(minutesDuration);
     }
+
     private static Task stringToTask(String string) {
         String[] values = string.split(",");
         switch (TaskType.valueOf(values[1])) {
@@ -135,7 +136,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     private static void loadHistoryToBuffer(List<Integer> listOfTaskIds, InMemoryTaskManager bufferKanban) {
-        if(!listOfTaskIds.isEmpty()) {
+        if (!listOfTaskIds.isEmpty()) {
             for (Integer id : listOfTaskIds) {
                 if (bufferKanban.mapOfTasks.containsKey(id)) {
                     bufferKanban.getTask(id);
@@ -152,7 +153,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         try {
             return Files.readString(Path.of(path));
         } catch (IOException e) {
-            System.out.println("Невозможно прочитать файл.");
+            System.out.println("Unable to read the file");
             return null;
         }
     }
@@ -164,26 +165,26 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         if (content != null) {
             lines = content.split("\r?\n");
         }
-        if(lines.length != 0) {
+        if (lines.length != 0) {
             //NOTE: First string is not used
             for (int i = 1; i < lines.length; i = i + 1) {
                 //NOTE: Pre-last string is always empty - therefore it has to be skipped
                 if (i == lines.length - 2) {
                     continue;
-                //NOTE: Last string is always history - therefore is skipped
+                    //NOTE: Last string is always history - therefore is skipped
                 } else if (i == lines.length - 1) {
                     loadHistoryToBuffer(historyFromString(lines[i]), bufferKanban);
                 } else {
                     Task task = stringToTask(lines[i]);
                     if (task != null) {
-                        switch(task.getType()) {
+                        switch (task.getType()) {
                             case TASK:
                                 bufferKanban.createTask(task.getName(), task.getDescription(), task.getStatus(),
                                         task.getStartTime(), task.getDuration());
                                 break;
                             case SUBTASK:
                                 bufferKanban.createSubTask(task.getName(), task.getDescription(), task.getStatus(),
-                                    ((SubTask) task).getEpicTaskId(), task.getStartTime(), task.getDuration());
+                                        ((SubTask) task).getEpicTaskId(), task.getStartTime(), task.getDuration());
                                 break;
                             case EPIC:
                                 bufferKanban.createEpicTask(task.getName(), task.getDescription(), task.getStatus());
@@ -235,7 +236,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         save();
         return epicTask;
     }
-        @Override
+
+    @Override
     public void renewTask(Task task) {
         super.renewTask(task);
         save();
@@ -278,7 +280,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public void removeEpicTask (Integer id) {
+    public void removeEpicTask(Integer id) {
         super.removeEpicTask(id);
         save();
     }
@@ -289,7 +291,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         try {
             Files.newBufferedWriter(Path.of(fileName), StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
-            System.out.println("Невозможно очистить файл.");
+            System.out.println("Unable to clear the file");
         }
     }
 }

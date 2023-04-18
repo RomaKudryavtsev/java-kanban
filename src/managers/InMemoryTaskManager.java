@@ -11,7 +11,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected HashMap<Integer, SubTask> mapOfSubTasks = new HashMap<>();
     protected HashMap<Integer, EpicTask> mapOfEpicTasks = new HashMap<>();
     Comparator<Task> priorityComparator = (task1, task2) -> {
-        if(!task1.getStartTime().equals(task2.getStartTime())) {
+        if (!task1.getStartTime().equals(task2.getStartTime())) {
             return task1.getStartTime().compareTo(task2.getStartTime());
         } else {
             return task1.getId() - task2.getId();
@@ -34,8 +34,8 @@ public class InMemoryTaskManager implements TaskManager {
     private long defineFirstSlotOfTask(LocalDateTime startTime) {
         long durationFromYearStart = defineDurationInMinutesFromYearStartToStartTime(startTime);
         long firstSlot = 1;
-        for(int i = 1; i <= durationFromYearStart; ++i) {
-            if(i % SLOT_SIZE_IN_MIN == 0) {
+        for (int i = 1; i <= durationFromYearStart; ++i) {
+            if (i % SLOT_SIZE_IN_MIN == 0) {
                 ++firstSlot;
             }
         }
@@ -45,8 +45,8 @@ public class InMemoryTaskManager implements TaskManager {
     private long defineNumberOfSlotsNeededForTask(Duration duration, LocalDateTime startTime) {
         long durationFromYearStart = defineDurationInMinutesFromYearStartToStartTime(startTime);
         int numberOfSlots = 1;
-        for(long l = durationFromYearStart + 1; l < durationFromYearStart + duration.toMinutes(); ++l) {
-            if(l % SLOT_SIZE_IN_MIN == 0) {
+        for (long l = durationFromYearStart + 1; l < durationFromYearStart + duration.toMinutes(); ++l) {
+            if (l % SLOT_SIZE_IN_MIN == 0) {
                 ++numberOfSlots;
             }
         }
@@ -56,7 +56,7 @@ public class InMemoryTaskManager implements TaskManager {
     private void reserveSlotsForTask(Task task) {
         long firstSlotForTask = defineFirstSlotOfTask(task.getStartTime());
         long slotsNeededForTask = defineNumberOfSlotsNeededForTask(task.getDuration(), task.getStartTime());
-        for(long l = firstSlotForTask; l < firstSlotForTask + slotsNeededForTask; ++l) {
+        for (long l = firstSlotForTask; l < firstSlotForTask + slotsNeededForTask; ++l) {
             slotsValidationMap.put(l, true);
         }
     }
@@ -65,9 +65,9 @@ public class InMemoryTaskManager implements TaskManager {
     private boolean validateIfSlotsForTaskAreEmpty(Duration duration, LocalDateTime startTime) {
         long firstSlotForTaskUnderValidation = defineFirstSlotOfTask(startTime);
         long slotsNeededForTaskUnderValidation = defineNumberOfSlotsNeededForTask(duration, startTime);
-        for(long l = firstSlotForTaskUnderValidation;
-            l < firstSlotForTaskUnderValidation + slotsNeededForTaskUnderValidation; ++l) {
-            if(slotsValidationMap.containsKey(l)) {
+        for (long l = firstSlotForTaskUnderValidation;
+             l < firstSlotForTaskUnderValidation + slotsNeededForTaskUnderValidation; ++l) {
+            if (slotsValidationMap.containsKey(l)) {
                 if (slotsValidationMap.get(l)) {
                     return false;
                 }
@@ -86,7 +86,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createTask(String name, String description, TaskStatus status, LocalDateTime startTime,
                            Duration duration) throws NonemptySlotsException {
-        if(validateIfSlotsForTaskAreEmpty(duration, startTime)) {
+        if (validateIfSlotsForTaskAreEmpty(duration, startTime)) {
             taskId = taskId + 1;
             Task task = new Task(name, description, status, TaskType.TASK, startTime, duration);
             task.setId(taskId);
@@ -109,7 +109,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createSubTask(String name, String description, TaskStatus status, int epicTaskId,
                               LocalDateTime startTime, Duration duration) throws NonemptySlotsException {
-        if(validateIfSlotsForTaskAreEmpty(duration, startTime)) {
+        if (validateIfSlotsForTaskAreEmpty(duration, startTime)) {
             taskId = taskId + 1;
             SubTask subTask = new SubTask(name, description, status, epicTaskId, TaskType.SUBTASK, startTime, duration);
             subTask.setId(taskId);
@@ -139,7 +139,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(Integer id) throws NoTasksCreatedException, NonexistentIdException {
-        if(!mapOfTasks.isEmpty()) {
+        if (!mapOfTasks.isEmpty()) {
             if (mapOfTasks.containsKey(id)) {
                 defaultHistory.add(mapOfTasks.get(id));
                 return mapOfTasks.get(id);
@@ -153,7 +153,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public SubTask getSubTask(Integer id) throws NoTasksCreatedException, NonexistentIdException {
-        if(!mapOfSubTasks.isEmpty()) {
+        if (!mapOfSubTasks.isEmpty()) {
             if (mapOfSubTasks.containsKey(id)) {
                 defaultHistory.add(mapOfSubTasks.get(id));
                 return mapOfSubTasks.get(id);
@@ -167,7 +167,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public EpicTask getEpicTask(Integer id) throws NoTasksCreatedException, NonexistentIdException {
-        if(!mapOfEpicTasks.isEmpty()) {
+        if (!mapOfEpicTasks.isEmpty()) {
             if (mapOfEpicTasks.containsKey(id)) {
                 defaultHistory.add(mapOfEpicTasks.get(id));
                 return mapOfEpicTasks.get(id);
@@ -181,7 +181,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void renewTask(Task task) {
-        if(!mapOfTasks.isEmpty()) {
+        if (!mapOfTasks.isEmpty()) {
             if (mapOfTasks.containsKey(task.getId())) {
                 Task renewedTask = mapOfTasks.get(task.getId());
                 mapOfTasks.put(task.getId(), task);
@@ -197,7 +197,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void renewSubTask(SubTask subTask) {
-        if(!mapOfSubTasks.isEmpty()) {
+        if (!mapOfSubTasks.isEmpty()) {
             if (mapOfSubTasks.containsKey(subTask.getId())) {
                 Task renewedSubtask = mapOfSubTasks.get(subTask.getId());
                 mapOfSubTasks.put(subTask.getId(), subTask);
@@ -216,8 +216,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void clearListOfTasks() {
         if (!mapOfTasks.isEmpty()) {
             Iterator<Task> iterator = setOfPrioritizedTasksAndSubtasks.iterator();
-            while(iterator.hasNext()){
-                if(iterator.next().getType() == TaskType.TASK) {
+            while (iterator.hasNext()) {
+                if (iterator.next().getType() == TaskType.TASK) {
                     iterator.remove();
                 }
             }
@@ -236,8 +236,8 @@ public class InMemoryTaskManager implements TaskManager {
                 mapOfEpicTasks.get(idOfEpicTask).removeSubTaskInEpicTask(subTaskToBeCleared);
             }
             Iterator<Task> iterator = setOfPrioritizedTasksAndSubtasks.iterator();
-            while(iterator.hasNext()){
-                if(iterator.next().getType() == TaskType.SUBTASK) {
+            while (iterator.hasNext()) {
+                if (iterator.next().getType() == TaskType.SUBTASK) {
                     iterator.remove();
                 }
             }
@@ -260,7 +260,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTask(Integer id) {
-        if(!mapOfTasks.isEmpty()) {
+        if (!mapOfTasks.isEmpty()) {
             if (mapOfTasks.containsKey(id)) {
                 setOfPrioritizedTasksAndSubtasks.remove(mapOfTasks.get(id));
                 mapOfTasks.remove(id);
@@ -276,7 +276,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubTask(Integer id) {
         //NOTE: Subtask is also removed from the epic task
-        if(!mapOfSubTasks.isEmpty()) {
+        if (!mapOfSubTasks.isEmpty()) {
             if (mapOfSubTasks.containsKey(id)) {
                 SubTask subTaskToBeRemoved = mapOfSubTasks.get(id);
                 setOfPrioritizedTasksAndSubtasks.remove(mapOfSubTasks.get(id));
@@ -292,9 +292,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeEpicTask (Integer id) {
+    public void removeEpicTask(Integer id) {
         //NOTE: All subtasks of the epic task are removed
-        if(!mapOfEpicTasks.isEmpty()) {
+        if (!mapOfEpicTasks.isEmpty()) {
             if (mapOfEpicTasks.containsKey(id)) {
                 for (SubTask subtaskToBeRemoved : mapOfEpicTasks.get(id).getListOfSubTasks()) {
                     setOfPrioritizedTasksAndSubtasks.remove(subtaskToBeRemoved);
@@ -315,7 +315,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<SubTask> getListOfSubTasksForEpicTask(Integer id) {
-        if(!mapOfEpicTasks.isEmpty()) {
+        if (!mapOfEpicTasks.isEmpty()) {
             ArrayList<SubTask> result;
             if (mapOfEpicTasks.containsKey(id)) {
                 result = mapOfEpicTasks.get(id).getListOfSubTasks();
@@ -334,26 +334,27 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected void clearAllData() {
-        if(!mapOfTasks.isEmpty()) {
+        if (!mapOfTasks.isEmpty()) {
             mapOfTasks.clear();
         }
-        if(!mapOfSubTasks.isEmpty()) {
+        if (!mapOfSubTasks.isEmpty()) {
             mapOfSubTasks.clear();
         }
-        if(!mapOfEpicTasks.isEmpty()) {
+        if (!mapOfEpicTasks.isEmpty()) {
             mapOfEpicTasks.clear();
         }
         taskId = 0;
-        if(!this.getHistoryManager().getHistory().isEmpty()) {
+        if (!this.getHistoryManager().getHistory().isEmpty()) {
             this.getHistoryManager().removeAll();
         }
-        if(!setOfPrioritizedTasksAndSubtasks.isEmpty()) {
+        if (!setOfPrioritizedTasksAndSubtasks.isEmpty()) {
             setOfPrioritizedTasksAndSubtasks.clear();
         }
-        if(!slotsValidationMap.isEmpty()) {
+        if (!slotsValidationMap.isEmpty()) {
             slotsValidationMap.clear();
         }
     }
+
     @Override
     public void clearAll() {
         this.clearAllData();

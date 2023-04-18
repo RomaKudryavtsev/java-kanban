@@ -404,8 +404,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
         final NonemptySlotsException exception = Assertions.assertThrows(
                 NonemptySlotsException.class,
                 () -> kanban.createTask("B", "B", TaskStatus.NEW,
-                            LocalDateTime.of(2022, 1, 1, 1, 0),
-                            Duration.ofMinutes(30)));
+                        LocalDateTime.of(2022, 1, 1, 1, 0),
+                        Duration.ofMinutes(30)));
         Assertions.assertEquals("Slots are not empty", exception.getMessage());
     }
 

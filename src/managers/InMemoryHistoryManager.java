@@ -1,6 +1,7 @@
 package managers;
 
 import tasks.*;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -13,11 +14,11 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node<Task> head;
     private Node<Task> tail;
 
-    private void linkLast (Task task) {
+    private void linkLast(Task task) {
         final Node<Task> oldTail = tail;
         final Node<Task> newNode = new Node<>(oldTail, task, null);
         tail = newNode;
-        if(oldTail == null) {
+        if (oldTail == null) {
             head = newNode;
         } else {
             oldTail.next = newNode;
@@ -28,10 +29,10 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     //NOTE: Three options are envisaged: removal of ordinary node, head node or tail node
     private void removeNode(Node<Task> nodeToBeRemoved) {
-        if(sizeOfCustomLinkedList != 0) {
-            if(nodeToBeRemoved.equals(head)) {
+        if (sizeOfCustomLinkedList != 0) {
+            if (nodeToBeRemoved.equals(head)) {
                 final Node<Task> oldHead = head;
-                if(head.equals(tail)) {
+                if (head.equals(tail)) {
                     tail = null;
                 } else {
                     head.next.prev = null;
@@ -54,7 +55,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private List<Task> getTasks() {
         List<Task> listOfTasksFromHistory = new ArrayList<>();
         Node<Task> currentNode = this.head;
-        for(int i = 0; i < sizeOfCustomLinkedList; ++i) {
+        for (int i = 0; i < sizeOfCustomLinkedList; ++i) {
             listOfTasksFromHistory.add(currentNode.data);
             currentNode = currentNode.next;
         }
@@ -63,7 +64,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private void removeAllTasks() {
         Node<Task> currentNode = this.tail;
-        for(int i = sizeOfCustomLinkedList; i >= 1; --i) {
+        for (int i = sizeOfCustomLinkedList; i >= 1; --i) {
             Node<Task> buffer = new Node<>(currentNode.prev, currentNode.data, currentNode.next);
             removeNode(currentNode);
             currentNode = buffer.prev;
@@ -72,13 +73,13 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-        if(sizeOfCustomLinkedList < SIZE_OF_HISTORY) {
-            if(tasksIdsAndNodes.containsKey(task.getId())) {
+        if (sizeOfCustomLinkedList < SIZE_OF_HISTORY) {
+            if (tasksIdsAndNodes.containsKey(task.getId())) {
                 removeNode(tasksIdsAndNodes.get(task.getId()));
             }
             linkLast(task);
         } else {
-            if(!tasksIdsAndNodes.containsKey(task.getId())) {
+            if (!tasksIdsAndNodes.containsKey(task.getId())) {
                 removeNode(head);
                 linkLast(task);
             } else {
@@ -90,7 +91,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        if(!tasksIdsAndNodes.isEmpty()) {
+        if (!tasksIdsAndNodes.isEmpty()) {
             removeNode(tasksIdsAndNodes.remove(id));
         }
     }

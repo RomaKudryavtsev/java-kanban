@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class HttpTaskManager extends FileBackedTasksManager implements TaskManager{
+public class HttpTaskManager extends FileBackedTasksManager implements TaskManager {
     static KVTaskClient client;
     private static final String LOCAL_DATE_TIME_FORMATTER = "dd--MM--yyyy HH:mm";
 
@@ -74,7 +74,7 @@ public class HttpTaskManager extends FileBackedTasksManager implements TaskManag
 
     private static List<Task> listOfTasksFromJson(String json) {
         List<Task> listOfTasks = new ArrayList<>();
-        if(!json.isEmpty()) {
+        if (!json.isEmpty()) {
             JsonElement jsonElement = JsonParser.parseString(json);
             JsonArray jsonArray = jsonElement.getAsJsonArray();
             for (JsonElement e : jsonArray) {
@@ -95,7 +95,7 @@ public class HttpTaskManager extends FileBackedTasksManager implements TaskManag
 
     private static List<SubTask> listOfSubTasksFromJson(String json) {
         List<SubTask> listOfSubTasks = new ArrayList<>();
-        if(!json.isEmpty()) {
+        if (!json.isEmpty()) {
             JsonElement jsonElement = JsonParser.parseString(json);
             JsonArray jsonArray = jsonElement.getAsJsonArray();
             for (JsonElement e : jsonArray) {
@@ -117,7 +117,7 @@ public class HttpTaskManager extends FileBackedTasksManager implements TaskManag
 
     private static List<EpicTask> listOfEpicTasksFromJson(String json) {
         List<EpicTask> listOfEpicTasks = new ArrayList<>();
-        if(!json.isEmpty()) {
+        if (!json.isEmpty()) {
             JsonElement jsonElement = JsonParser.parseString(json);
             JsonArray jsonArray = jsonElement.getAsJsonArray();
             for (JsonElement e : jsonArray) {
@@ -135,7 +135,7 @@ public class HttpTaskManager extends FileBackedTasksManager implements TaskManag
 
     private static List<Integer> listOfIdsFromJson(String json) {
         List<Integer> listOfIdsFromHistory = new ArrayList<>();
-        if(!json.isEmpty()) {
+        if (!json.isEmpty()) {
             JsonElement jsonElement = JsonParser.parseString(json);
             JsonArray jsonArray = jsonElement.getAsJsonArray();
             for (JsonElement e : jsonArray) {
@@ -148,7 +148,7 @@ public class HttpTaskManager extends FileBackedTasksManager implements TaskManag
 
     private static void loadTasksToBuffer(InMemoryTaskManager bufferKanban) {
         String jsonTasksString = client.load("task");
-        if(!jsonTasksString.isEmpty()) {
+        if (!jsonTasksString.isEmpty()) {
             List<Task> listOfTasks = listOfTasksFromJson(jsonTasksString);
             for (Task task : listOfTasks) {
                 bufferKanban.createTask(task.getName(), task.getDescription(), task.getStatus(), task.getStartTime(),
@@ -156,14 +156,14 @@ public class HttpTaskManager extends FileBackedTasksManager implements TaskManag
             }
         }
         String jsonEpicString = client.load("epic");
-        if(!jsonEpicString.isEmpty()) {
+        if (!jsonEpicString.isEmpty()) {
             List<EpicTask> listOfEpicTasks = listOfEpicTasksFromJson(jsonEpicString);
             for (EpicTask epic : listOfEpicTasks) {
                 bufferKanban.createEpicTask(epic.getName(), epic.getDescription(), epic.getStatus());
             }
         }
         String jsonSubtasksString = client.load("subtask");
-        if(!jsonSubtasksString.isEmpty()) {
+        if (!jsonSubtasksString.isEmpty()) {
             List<SubTask> listOfSubtasks = listOfSubTasksFromJson(jsonSubtasksString);
             for (SubTask subtask : listOfSubtasks) {
                 bufferKanban.createSubTask(subtask.getName(), subtask.getDescription(), subtask.getStatus(),
@@ -175,7 +175,7 @@ public class HttpTaskManager extends FileBackedTasksManager implements TaskManag
     private static void loadHistoryToBuffer(InMemoryTaskManager bufferKanban) {
         String jsonHistoryString = client.load("history");
         List<Integer> listOfIdsFromHistory = listOfIdsFromJson(jsonHistoryString);
-        for(Integer id : listOfIdsFromHistory) {
+        for (Integer id : listOfIdsFromHistory) {
             if (bufferKanban.mapOfTasks.containsKey(id)) {
                 bufferKanban.getTask(id);
             } else if (bufferKanban.mapOfSubTasks.containsKey(id)) {

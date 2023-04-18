@@ -253,16 +253,16 @@ public class HttpTaskServerTest {
     private HttpResponse<String> sendGetRequest(TaskType type, boolean toGetPrioritizedList,
                                                 boolean toGetParticularTask, int id, boolean toGetSubtasksForEpic) {
         URI url;
-        if(toGetPrioritizedList) {
+        if (toGetPrioritizedList) {
             url = URI.create("http://localhost:8080/tasks");
         } else {
             String typeForUrl = type.toString().toLowerCase();
-            if(!toGetParticularTask) {
+            if (!toGetParticularTask) {
                 url = URI.create(String.format("http://localhost:8080/tasks/%s", typeForUrl));
             } else {
                 url = URI.create(String.format("http://localhost:8080/tasks/%s/?id=%d", typeForUrl, id));
             }
-            if(toGetSubtasksForEpic) {
+            if (toGetSubtasksForEpic) {
                 url = URI.create(String.format("http://localhost:8080/tasks/subtask/epic/?id=%d", id));
             }
         }
@@ -283,7 +283,7 @@ public class HttpTaskServerTest {
     private HttpResponse<String> sendDeleteRequest(TaskType type, boolean deleteParticularTask, int id) {
         URI url;
         String typeForUrl = type.toString().toLowerCase();
-        if(!deleteParticularTask) {
+        if (!deleteParticularTask) {
             url = URI.create(String.format("http://localhost:8080/tasks/%s", typeForUrl));
         } else {
             url = URI.create(String.format("http://localhost:8080/tasks/%s?id=%d", typeForUrl, id));
@@ -304,10 +304,10 @@ public class HttpTaskServerTest {
 
     //NOTE: Request bodies were got from Insomnia
     private String getJsonPostRequestBody(TaskType type, boolean toBeRenewed, boolean isFirst) {
-        if(!toBeRenewed) {
+        if (!toBeRenewed) {
             switch (type) {
                 case TASK:
-                    if(isFirst) {
+                    if (isFirst) {
                         return "{\n" +
                                 "\t\"name\": \"T1\",\n" +
                                 "\t\"description\": \"TT1\",\n" +
@@ -325,7 +325,7 @@ public class HttpTaskServerTest {
                                 "}";
                     }
                 case SUBTASK:
-                    if(isFirst) {
+                    if (isFirst) {
                         return "{\n" +
                                 "\t\"name\": \"S1\",\n" +
                                 "\t\"description\": \"SS1\",\n" +
@@ -345,7 +345,7 @@ public class HttpTaskServerTest {
                                 "}";
                     }
                 case EPIC:
-                    if(isFirst) {
+                    if (isFirst) {
                         return "{\n" +
                                 "\t\"name\": \"E1\",\n" +
                                 "\t\"description\": \"EE1\",\n" +

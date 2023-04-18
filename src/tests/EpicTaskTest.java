@@ -34,7 +34,7 @@ class EpicTaskTest {
     void statusOfEmptyEpicTaskIsNew() {
         TaskStatus expected = TaskStatus.NEW;
         TaskStatus result = kanban.getEpicTask(1).getStatus();
-        Assertions.assertEquals(expected,result);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test

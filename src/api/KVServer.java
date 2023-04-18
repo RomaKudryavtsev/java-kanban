@@ -30,18 +30,18 @@ public class KVServer {
     }
 
     private void clear(HttpExchange h) throws IOException {
-        try{
+        try {
             System.out.println("\n/clear");
-            if(!hasAuth(h)) {
-                System.out.println("Запрос неавторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
+            if (!hasAuth(h)) {
+                System.out.println("Request is not authorized, API_TOKEN is needed");
                 h.sendResponseHeaders(403, 0);
                 return;
             }
-            if("DELETE".equals(h.getRequestMethod())) {
+            if ("DELETE".equals(h.getRequestMethod())) {
                 data.clear();
                 h.sendResponseHeaders(200, 0);
             } else {
-                System.out.println("/clear ждёт DELETE-запрос, а получил: " + h.getRequestMethod());
+                System.out.println("/clear awaits for DELETE-request, but received: " + h.getRequestMethod());
                 h.sendResponseHeaders(405, 0);
             }
         } finally {
@@ -52,32 +52,32 @@ public class KVServer {
     private void load(HttpExchange h) throws IOException {
         try {
             System.out.println("\n/load");
-            if(!hasAuth(h)) {
-                System.out.println("Запрос неавторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
+            if (!hasAuth(h)) {
+                System.out.println("Request is not authorized, API_TOKEN is needed");
                 h.sendResponseHeaders(403, 0);
                 return;
             }
-            if("GET".equals(h.getRequestMethod())) {
+            if ("GET".equals(h.getRequestMethod())) {
                 String key = h.getRequestURI().getPath().substring("/load/".length());
-                if(key.isEmpty()) {
-                    System.out.println("Key для сохранения пустой. key указывается в пути: /load/{key}");
+                if (key.isEmpty()) {
+                    System.out.println("Key for loading is empty. key is specified in: /load/{key}");
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
-                if(!data.keySet().contains(key)) {
+                if (!data.keySet().contains(key)) {
                     h.sendResponseHeaders(404, 0);
-                    System.out.println(String.format("Key %s еще не был создан", key));
+                    System.out.println(String.format("Key %s was not created", key));
                     return;
                 }
                 String response = data.get(key);
                 h.sendResponseHeaders(200, 0);
-                try(OutputStream os = h.getResponseBody()) {
+                try (OutputStream os = h.getResponseBody()) {
                     String jsonResponse = gson.toJson(response);
                     os.write(jsonResponse.getBytes());
 
                 }
             } else {
-                System.out.println("/load ждёт GET-запрос, а получил: " + h.getRequestMethod());
+                System.out.println("/load awaits for GET-request, but received: " + h.getRequestMethod());
                 h.sendResponseHeaders(405, 0);
             }
         } finally {
@@ -89,28 +89,28 @@ public class KVServer {
         try {
             System.out.println("\n/save");
             if (!hasAuth(h)) {
-                System.out.println("Запрос неавторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
+                System.out.println("Request is not authorized, API_TOKEN is needed");
                 h.sendResponseHeaders(403, 0);
                 return;
             }
             if ("POST".equals(h.getRequestMethod())) {
                 String key = h.getRequestURI().getPath().substring("/save/".length());
                 if (key.isEmpty()) {
-                    System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");
+                    System.out.println("Key for saving is empty. key is specified in: /save/{key}");
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
                 String value = readText(h);
                 if (value.isEmpty()) {
-                    System.out.println("Value для сохранения пустой. value указывается в теле запроса");
+                    System.out.println("Value for saving is empty. value has to be specified in request body");
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
                 data.put(key, value);
-                System.out.println("Значение для ключа " + key + " успешно обновлено!");
+                System.out.println("Value for key " + key + " is successfully updated!");
                 h.sendResponseHeaders(200, 0);
             } else {
-                System.out.println("/save ждёт POST-запрос, а получил: " + h.getRequestMethod());
+                System.out.println("/save awaits for POST-request, but received: " + h.getRequestMethod());
                 h.sendResponseHeaders(405, 0);
             }
         } finally {
@@ -125,7 +125,7 @@ public class KVServer {
                 //apiToken = generateApiToken();
                 sendText(h, apiToken);
             } else {
-                System.out.println("/register ждёт GET-запрос, а получил " + h.getRequestMethod());
+                System.out.println("/register awaits for GET-request, but received " + h.getRequestMethod());
                 h.sendResponseHeaders(405, 0);
             }
         } finally {
@@ -134,14 +134,14 @@ public class KVServer {
     }
 
     public void start() {
-        System.out.println("Запускаем сервер на порту " + PORT);
-        System.out.println("Открой в браузере http://localhost:" + PORT + "/");
+        System.out.println("Server is started on port " + PORT);
+        System.out.println("Open in browser http://localhost:" + PORT + "/");
         System.out.println("API_TOKEN: " + apiToken);
         server.start();
     }
 
     public void stop() {
-        System.out.println("Останавливаем сервер на " + PORT);
+        System.out.println("Server is stopped on " + PORT);
         server.stop(0);
     }
 

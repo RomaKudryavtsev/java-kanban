@@ -68,7 +68,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
             String fileString = Files.readString(path);
             String[] resultStringArray = fileString.split("\r?\n");
             String[] expectedStringArray = getExpectedStringArray();
-            for(int i = 0; i < resultStringArray.length; ++i) {
+            for (int i = 0; i < resultStringArray.length; ++i) {
                 Assertions.assertEquals(expectedStringArray[i], resultStringArray[i]);
             }
         } catch (IOException e) {

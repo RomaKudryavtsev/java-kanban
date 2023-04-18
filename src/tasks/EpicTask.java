@@ -24,7 +24,7 @@ public class EpicTask extends Task {
         if (mapOfSubTasksForEpicTask.isEmpty()) {
             allSubTasksAreDone = false;
         } else {
-            for(SubTask subTask : mapOfSubTasksForEpicTask.values()) {
+            for (SubTask subTask : mapOfSubTasksForEpicTask.values()) {
                 if (subTask.getStatus() == TaskStatus.IN_PROGRESS || subTask.getStatus() == TaskStatus.NEW) {
                     allSubTasksAreDone = false;
                     break;
@@ -36,7 +36,7 @@ public class EpicTask extends Task {
 
     private boolean checkWhetherAllSubtasksAreNew() {
         boolean allSubtasksAreNew = true;
-        if(mapOfSubTasksForEpicTask.isEmpty()) {
+        if (mapOfSubTasksForEpicTask.isEmpty()) {
             allSubtasksAreNew = false;
         } else {
             for (SubTask subTask : mapOfSubTasksForEpicTask.values()) {
@@ -56,7 +56,7 @@ public class EpicTask extends Task {
             if (this.checkWhetherEpicTaskIsDone()) {
                 this.setStatus(TaskStatus.DONE);
             } else {
-                if(this.checkWhetherAllSubtasksAreNew()) {
+                if (this.checkWhetherAllSubtasksAreNew()) {
                     this.setStatus(TaskStatus.NEW);
                 } else {
                     this.setStatus(TaskStatus.IN_PROGRESS);
@@ -70,7 +70,7 @@ public class EpicTask extends Task {
     }
 
     private void calculateDurationOfEpicTask() {
-        if(mapOfSubTasksForEpicTask.isEmpty()) {
+        if (mapOfSubTasksForEpicTask.isEmpty()) {
             this.duration = Duration.ofMinutes(0);
         } else {
             this.duration = mapOfSubTasksForEpicTask.values().stream().map(SubTask::getDuration)
@@ -79,7 +79,7 @@ public class EpicTask extends Task {
     }
 
     private void defineStartTimeOfEpicTask() {
-        if(mapOfSubTasksForEpicTask.isEmpty()) {
+        if (mapOfSubTasksForEpicTask.isEmpty()) {
             this.startTime = DEFAULT_START_TIME;
         } else if (mapOfSubTasksForEpicTask.size() == 1) {
             this.startTime = mapOfSubTasksForEpicTask.values().stream().findFirst().get().getStartTime();
@@ -91,7 +91,7 @@ public class EpicTask extends Task {
     }
 
     private void defineEndTimeOfEpicTask() {
-        if(mapOfSubTasksForEpicTask.isEmpty()) {
+        if (mapOfSubTasksForEpicTask.isEmpty()) {
             this.endTime = DEFAULT_START_TIME;
         } else if (mapOfSubTasksForEpicTask.size() == 1) {
             this.endTime = mapOfSubTasksForEpicTask.values().stream().findFirst().get().getEndTime();
@@ -113,7 +113,7 @@ public class EpicTask extends Task {
 
     //NOTE: This method RENEWS subtask in epic task
     public void renewSubTaskInEpicTask(SubTask subTask) {
-        if(checkWhetherEpicTaskContainsSubTask(subTask)) {
+        if (checkWhetherEpicTaskContainsSubTask(subTask)) {
             mapOfSubTasksForEpicTask.put(subTask.getId(), subTask);
             setEpicTaskStatus();
             calculateDurationOfEpicTask();
@@ -124,7 +124,7 @@ public class EpicTask extends Task {
 
     //NOTE: This method REMOVES subtask from epic task
     public void removeSubTaskInEpicTask(SubTask subTask) {
-        if(checkWhetherEpicTaskContainsSubTask(subTask)) {
+        if (checkWhetherEpicTaskContainsSubTask(subTask)) {
             mapOfSubTasksForEpicTask.remove(subTask.getId());
             setEpicTaskStatus();
             calculateDurationOfEpicTask();
@@ -142,7 +142,7 @@ public class EpicTask extends Task {
     }
 
     public ArrayList<SubTask> getListOfSubTasks() {
-        return new ArrayList<>(mapOfSubTasksForEpicTask.values()) ;
+        return new ArrayList<>(mapOfSubTasksForEpicTask.values());
     }
 
     @Override
