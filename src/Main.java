@@ -29,7 +29,6 @@ public class Main {
             server.start();
             //Serialization using the server
             HttpTaskManager kanban = new HttpTaskManager("http://localhost:8078");
-
             kanban.createTask("T1", "TT1", TaskStatus.NEW,
                     LocalDateTime.of(2022, 1, 1, 0, 0), Duration.ofMinutes(120));
             kanban.createEpicTask("E1", "EE1", TaskStatus.NEW);
@@ -48,7 +47,6 @@ public class Main {
             printer.printList(kanbanFromServer.getListOfSubTasks());
             System.out.println("History:");
             printer.printList(kanbanFromServer.getHistoryManager().getHistory());
-
             server.stop();
         }
     }
